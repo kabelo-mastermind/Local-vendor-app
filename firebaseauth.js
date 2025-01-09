@@ -82,5 +82,5 @@ signUpForm.addEventListener("submit", async (e) => {
       showMessage("Unable to create user. Please try again.", "signUpMessage", "error");
     }
 }
-  }
+  
 });
