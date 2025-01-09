@@ -137,6 +137,16 @@ button.btn-primary:hover {
     opacity: 0;
     animation: fadeOut 7s forwards;
 }
+
+  
+  .messageDiv .success {
+    color: green;
+  }
+  
+  .messageDiv .error {
+    color: red;
+  }
+  
 /* Responsive Styles */
 @media (max-width: 768px) {
     .modal-content {

@@ -1,4 +1,4 @@
-// Import the functions you need from the SDKs you need
+// Import the functions you need from the SDKs
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
@@ -18,29 +18,30 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+const auth = getAuth();
+const db = getFirestore();
 
 // Function to show messages
-function showMessage(message, divId) {
+function showMessage(message, divId, type = "success") {
   const div = document.getElementById(divId);
-  const messageDiv = document.createElement('div');
-  messageDiv.innerHTML = message;
-  messageDiv.style.display = 'block';
-  messageDiv.style.opacity = 1;
-  div.appendChild(messageDiv);
+  div.innerHTML = `<span class="${type}">${message}</span>`;
+  div.style.display = "block";
+
+  // Hide the message after 5 seconds
   setTimeout(() => {
-    messageDiv.style.opacity = 0;
-    div.removeChild(messageDiv); // Clean up after the message fades out
+    div.style.display = "none";
+    div.innerHTML = "";
   }, 5000);
 }
 
-// Sign-up event listener
-const signUp = document.getElementById('signUp');
-signUp.addEventListener('click', async () => {
-  const name = document.getElementById('name').value;
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  const auth = getAuth();
-  const db = getFirestore();
+// Sign-up form submission
+const signUpForm = document.getElementById("signupForm");
+signUpForm.addEventListener("submit", async (e) => {
+  e.preventDefault(); // Prevent the default form submission
+
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
   try {
     // Create user with email and password
@@ -51,25 +52,28 @@ signUp.addEventListener('click', async () => {
     const userData = {
       name: name,
       email: email,
-      password: password, // Consider NOT saving the password in plain text for security
     };
     const docRef = doc(db, "users", user.uid);
     await setDoc(docRef, userData);
 
-    // Show success message and redirect
-    showMessage('Account created successfully', 'signUpMessage');
-    window.location.href = 'index.html';
+    // Show success message
+    showMessage("Account created successfully", "signUpMessage", "success");
+
+    // Redirect to home page
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 3000);
   } catch (error) {
-    console.error("Error writing document", error);
+    console.error("Error creating user:", error);
 
     // Handle errors
     const errorCode = error.code;
-    if (errorCode === 'auth/email-already-in-use') {
-      showMessage('Email already in use', 'signUpMessage');
-    } else if (errorCode === 'auth/weak-password') {
-      showMessage('Password is too weak', 'signUpMessage');
+    if (errorCode === "auth/email-already-in-use") {
+      showMessage("Email already in use", "signUpMessage", "error");
+    } else if (errorCode === "auth/weak-password") {
+      showMessage("Password is too weak", "signUpMessage", "error");
     } else {
-      showMessage('Unable to create user. Please try again.', 'signUpMessage');
+      showMessage("Unable to create user. Please try again.", "signUpMessage", "error");
     }
   }
 });
