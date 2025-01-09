@@ -35,7 +35,7 @@ function showMessage(message, divId, type = "success") {
 }
 
 // Sign-up form submission
-const signUpForm = document.getElementById("signupForm");
+const signUpForm = document.getElementById("signUp");
 signUpForm.addEventListener("submit", async (e) => {
   e.preventDefault(); // Prevent the default form submission
   console.log("Form submitted");
