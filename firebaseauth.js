@@ -38,15 +38,18 @@ function showMessage(message, divId, type = "success") {
 const signUpForm = document.getElementById("signupForm");
 signUpForm.addEventListener("submit", async (e) => {
   e.preventDefault(); // Prevent the default form submission
+  console.log("Form submitted");
 
   const name = document.getElementById("name").value;
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
+  
+  console.log(name, email, password); // Log values to check if they are correct
 
   try {
-    // Create user with email and password
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
+    console.log("User created:", user);
 
     // Save user data in Firestore
     const userData = {
@@ -55,8 +58,8 @@ signUpForm.addEventListener("submit", async (e) => {
     };
     const docRef = doc(db, "users", user.uid);
     await setDoc(docRef, userData);
+    console.log("User data saved to Firestore");
 
-    // Show success message
     showMessage("Account created successfully", "signUpMessage", "success");
 
     // Redirect to home page
@@ -65,8 +68,6 @@ signUpForm.addEventListener("submit", async (e) => {
     }, 3000);
   } catch (error) {
     console.error("Error creating user:", error);
-
-    // Handle errors
     const errorCode = error.code;
     if (errorCode === "auth/email-already-in-use") {
       showMessage("Email already in use", "signUpMessage", "error");
