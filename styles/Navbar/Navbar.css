@@ -1,0 +1,185 @@
+/* Navbar */
+.navbar {
+    background-color: #1a1a2e;
+    padding: 15px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar .logo a {
+    font-size: 24px;
+    color: #ffcc00;
+    text-decoration: none;
+    font-weight: bold;
+    margin-left: 20px;
+
+}
+
+.navbar .nav-links ul {
+    display: flex;
+    list-style: none;
+    gap: 20px;
+}
+
+.navbar .nav-links ul li a {
+    text-decoration: none;
+    font-size: 16px;
+    color: #e0e0e0;
+    transition: color 0.3s ease;
+}
+
+.navbar .nav-links ul li a:hover {
+    color: #ffcc00;
+}
+
+.navbar .menu-icon {
+    display: none;
+    cursor: pointer;
+    color: #ffcc00;
+    font-size: 24px;
+}
+
+/* Navbar-specific ul */
+.navbar ul {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+.navbar ul li {
+    position: relative;
+    margin-right: 20px;
+}
+
+.navbar ul li a {
+    text-decoration: none;
+    font-size: 16px;
+    color: #e0e0e0;
+    transition: color 0.3s ease;
+    padding: 5px 10px;
+    display: inline-block;
+}
+
+.navbar ul li a:hover {
+    color: #ffcc00;
+}
+
+/* Styling for the notification badge */
+.navbar .notification {
+    position: absolute;
+    top: -5px;
+    right: -10px;
+    background-color: #ffcc00;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: bold;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: scale(1);
+    transition: transform 0.2s ease;
+}
+
+.navbar .notification:hover {
+    transform: scale(1.2);
+}
+/* Hero Banner */
+.hero {
+    background-image: url('../../assets/images/hero.svg');
+    background-size: cover;
+    background-position: center;
+    color: #ffffff;
+    text-align: center;
+    padding: 80px 20px;
+    position: relative;
+}
+.hero::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+.hero .hero-container {
+    position: relative;
+    z-index: 2;
+}
+.hero h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+.hero p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+.hero .btn-primary {
+    padding: 10px 20px;
+    background-color: #ffcc00;
+    color: #1a1a2e;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+.hero .btn-primary:hover {
+    background-color: #e0a800;
+}
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .navbar ul {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar ul li {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .notification {
+        top: 0;
+        right: -10px; /* Keep it closer to the link */
+        transform: translate(50%, -50%);
+    }
+}
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar .nav-links ul {
+        display: none;
+        flex-direction: column;
+        background-color: #1a1a2e;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        width: 200px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .navbar .nav-links.active ul {
+        display: flex;
+    }
+    .navbar .menu-icon {
+        display: block;
+    }
+    .hero h1 {
+        font-size: 28px;
+    }
+    .hero p {
+        font-size: 16px;
+    }
+}

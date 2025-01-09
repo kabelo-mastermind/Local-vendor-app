@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zambane</title>
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="./styles/style.css">
+    <!-- Footer CSS -->
+    <link rel="stylesheet" href="./styles/Footer/Footer.css">
+    <!-- navbar css -->
+     <link rel="stylesheet" href="./styles/Navbar/Navbar.css">
+     <!-- map  -->
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    
+</head>
+<body>
+
+
+<!-- Navbar -->
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="./index.html">Zambane</a>
+            </div>
+            <div class="nav-links">
+                <ul>
+                    <li><a href="./index.html">Home</a></li>
+                    <li><a href="#" id="openMap">Requests</a><span class="notification">1</span></li> <!-- Changed link to trigger scroll -->
+                    <li><a href="#" class="sign-out">Sign in</a></li>
+                </ul>
+            </div>
+            <div class="menu-icon">
+                <span>&#9776;</span>
+            </div>
+        </div>
+    </nav>
+</header>
+
+
+
+ <!-- Hero Banner -->
+<section class="hero">
+    <div class="hero-container">
+        <h1>Welcome to Zambane</h1>
+        <p>Connecting local vendors with their community to meet daily needs effortlessly.</p>
+        <button id="makeRequestBtn" class="btn-primary">Make a Request</button>
+    </div>
+</section>
+<!-- Sign Up Modal -->
+<div id="signupModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Sign Up</h2>
+        <form id="signupForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" placeholder="Enter your name" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+
+            <button type="submit" class="btn-primary">Sign Up</button>
+            <h3>Already have an account? <a href="#" id="openSignIn">Login now</a></h3>
+        </form>
+    </div>
+</div>
+
+<!-- Sign In Modal -->
+<div id="signinModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>Sign In</h2>
+        <form id="signinForm">
+            <label for="email">Email:</label>
+            <input type="email" id="signinEmail" name="email" placeholder="Enter your email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="signinPassword" name="password" placeholder="Enter your password" required>
+
+            <button type="submit" class="btn-primary">Sign In</button>
+            <h3>Don't have an account? <a href="#" id="openSignUp">Sign up now</a></h3>
+        </form>
+    </div>
+</div>
+
+<!-- Add your styles for the modal -->
+
+
+    <main>
+        <div class="card-container">
+            <!-- Vegetable Card 1 -->
+            <div class="blog-card">
+                <img src="./assets/images/tomato.jpg" alt="Tomatoes">
+                <div class="blog-card-content">
+                    <h3>Tomatoes</h3>
+                    <p>Fresh and juicy tomatoes perfect for your meals.</p>
+                    <span>R5.00 packet</span>
+                </div>
+            </div>
+
+            <!-- Vegetable Card 2 -->
+            <div class="blog-card">
+                <img src="./assets/images/carrots.jpg" alt="Carrots">
+                <div class="blog-card-content">
+                    <h3>Carrots</h3>
+                    <p>Crunchy and sweet carrots for snacks and recipes.</p>
+                    <span>R5.50 packet</span>
+                </div>
+            </div>
+
+            <!-- Vegetable Card 3 -->
+            <div class="blog-card">
+                <img src="./assets/images/cabbage.jpg" alt="Cabbage">
+                <div class="blog-card-content">
+                    <h3>Cabbage</h3>
+                    <p>Fresh green cabbage for a healthy diet.</p>
+                    <span>R5.50 packet</span>
+                </div>
+            </div>
+
+            <!-- Vegetable Card 4 -->
+            <div class="blog-card">
+                <img src="./assets/images/onion.jpg" alt="Onions">
+                <div class="blog-card-content">
+                    <h3>Onions</h3>
+                    <p>Flavorful onions to enhance your dishes.</p>
+                    <span>R5.00 packet</span>
+                </div>
+            </div>
+
+            <!-- Vegetable Card 5 -->
+            <div class="blog-card">
+                <img src="./assets/images/potato.jpg" alt="potato">
+                <div class="blog-card-content">
+                    <h3>Potatoes</h3>
+                    <p>Colorful potato for vibrant meals.</p>
+                    <span>R5.00 packet</span>
+                </div>
+            </div>
+        </div>
+        <div id="map"></div>
+    </main>
+    <footer class="simple-footer">
+        <p>Developed by <a href="https://saronadevs.co.za/" target="_blank">Saronadevs</a></p>
+    </footer>
+    
+    
+    
+    <script>
+        // JavaScript for responsive navbar
+        const menuIcon = document.querySelector('.menu-icon span');
+        const navLinks = document.querySelector('.nav-links');
+        menuIcon.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+        
+    </script>
+     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+     <!-- mapping the vendors and customers -->
+<script>
+    // Initialize the map object and set its view to Soshanguve, Pretoria
+    var map = L.map('map').setView([-25.5416, 28.0992], 13); // Centered in Soshanguve
+
+    // Add a tile layer to the map (OpenStreetMap tiles)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Coordinates for customers (blue markers)
+    var customerCoordinates = [
+        [-25.5400, 28.0950],
+        [-25.5420, 28.0980],
+        [-25.5435, 28.1010],
+        [-25.5440, 28.0965],
+        [-25.5410, 28.1000],
+        [-25.5430, 28.0945],
+        [-25.5425, 28.0905],
+        [-25.5415, 28.0890]
+    ];
+
+    // Coordinates for vendors (green markers)
+    var vendorCoordinates = [
+        [-25.5390, 28.0920],
+        [-25.5405, 28.0935],
+       
+    ];
+
+    // Add blue markers for customers
+    customerCoordinates.forEach(coord => {
+        L.marker(coord, { icon: L.icon({
+            iconUrl: './assets/markers/customer.jpg',
+            iconSize: [30, 38], // Size of the marker
+            iconAnchor: [15, 50], // Anchor point of the marker
+            popupAnchor: [0, -50] // Popup position
+        }) })
+        .addTo(map)
+        .bindPopup("<b>Customer</b>");
+    });
+
+    // Add green markers for vendors
+    vendorCoordinates.forEach(coord => {
+        L.marker(coord, { icon: L.icon({
+            iconUrl: './assets/markers/vendor.jpg',
+            iconSize: [30, 38], // Size of the marker
+            iconAnchor: [15, 50], // Anchor point of the marker
+            popupAnchor: [0, -50] // Popup position
+        }) })
+        .addTo(map)
+        .bindPopup("<b>Vendor</b>");
+    });
+</script>
+<!-- Add JavaScript to handle modal toggling -->
+<script>
+    const signupModal = document.getElementById('signupModal');
+const signinModal = document.getElementById('signinModal');
+const signupBtn = document.querySelector('.btn-primary');
+const openSignUp = document.getElementById('openSignUp');
+const openSignIn = document.getElementById('openSignIn');
+const closeBtns = document.querySelectorAll('.close-btn');
+
+// Open Sign Up Modal
+signupBtn.addEventListener('click', () => {
+    signupModal.style.display = 'block';
+});
+
+// Open Sign In Modal when "Sign Out" is clicked in navbar
+document.querySelector('.sign-out').addEventListener('click', (e) => {
+    e.preventDefault();
+    signupModal.style.display = 'none';
+    signinModal.style.display = 'block';
+});
+
+// Open Sign In Modal
+openSignIn.addEventListener('click', (e) => {
+    e.preventDefault();
+    signupModal.style.display = 'none';
+    signinModal.style.display = 'block';
+});
+
+// Switch to Sign Up Modal from Sign In
+openSignUp.addEventListener('click', (e) => {
+    e.preventDefault();
+    signinModal.style.display = 'none';
+    signupModal.style.display = 'block';
+});
+
+// Close modals
+closeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        signupModal.style.display = 'none';
+        signinModal.style.display = 'none';
+    });
+});
+
+// Close modals when clicking outside of modal
+window.addEventListener('click', (e) => {
+    if (e.target === signupModal || e.target === signinModal) {
+        signupModal.style.display = 'none';
+        signinModal.style.display = 'none';
+    }
+});
+// for smooth scrolling to the map section
+document.getElementById('openMap').addEventListener('click', function(e) {
+    e.preventDefault();  // Prevent default link behavior (navigation)
+    
+    // Scroll smoothly to the map section
+    document.getElementById('map').scrollIntoView({
+        behavior: 'smooth'
+    });
+});
+
+</script>
+
+
+</body>
+</html>
