@@ -1,7 +1,14 @@
 [[headers]]
 for = "/*"
 [headers.values]
-  Content-Security-Policy = "script-src 'self' https://www.gstatic.com https://www.googleapis.com; object-src 'none'"
+  Content-Security-Policy = "script-src 'self' https://apis.google.com https://www.gstatic.com https://www.googleapis.com https://www.googletagmanager.com; connect-src 'self' https://www.googleapis.com https://www.googletagmanager.com https://firebase.googleapis.com; object-src 'none';"
   Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
   X-Frame-Options = "DENY"
   X-Content-Type-Options = "nosniff"
+
+[[plugins]]
+package = "netlify-plugin-csp-generator"
+[plugins.inputs]
+  buildDir = "dist"
+  [plugins.inputs.policies]
+  defaultSrc = "'self'"
