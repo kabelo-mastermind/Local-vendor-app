@@ -67,14 +67,20 @@ signUpForm.addEventListener("submit", async (e) => {
       window.location.href = "index.html";
     }, 3000);
   } catch (error) {
-    console.error("Error creating user:", error);
+    console.error("Error creating user:", error); // Log the entire error object
     const errorCode = error.code;
+    console.log("Error code:", errorCode); // Log the error code
+
     if (errorCode === "auth/email-already-in-use") {
+      console.log("Email already in use");
       showMessage("Email already in use", "signUpMessage", "error");
     } else if (errorCode === "auth/weak-password") {
+      console.log("Password is too weak");
       showMessage("Password is too weak", "signUpMessage", "error");
     } else {
+      console.log("Unable to create user. Please try again.");
       showMessage("Unable to create user. Please try again.", "signUpMessage", "error");
     }
+}
   }
 });
