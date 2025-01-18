@@ -80,6 +80,11 @@ if (!window.supabase) {
     } else {
       makeRequestBtn.textContent = makeRequestBtn.dataset.defaultText;
     }
+
+    // Force DOM repaint to apply the text change immediately
+    makeRequestBtn.style.display = "none";
+    makeRequestBtn.offsetHeight; // Trigger reflow
+    makeRequestBtn.style.display = "inline-block";
   }
 
   // Fetch session on initial load
