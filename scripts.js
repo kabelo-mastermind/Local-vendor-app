@@ -123,20 +123,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
  // Button and authentication listener
-const makeRequestBtn = document.getElementById("makeRequestBtn");
+// const makeRequestBtn = document.getElementById("makeRequestBtn");
 
-// Function to update button text based on login status
-function updateButtonText() {
-  const user = supabase.auth.user();
-  if (user) {
-    makeRequestBtn.textContent = makeRequestBtn.dataset.loggedInText;
-  } else {
-    makeRequestBtn.textContent = makeRequestBtn.dataset.defaultText;
-  }
-}
+// // Function to update button text based on login status
+// function updateButtonText() {
+//   const user = supabase.auth.user();
+//   if (user) {
+//     makeRequestBtn.textContent = makeRequestBtn.dataset.loggedInText;
+//   } else {
+//     makeRequestBtn.textContent = makeRequestBtn.dataset.defaultText;
+//   }
+// }
 
-// Initial button text update
-updateButtonText();
+// // Initial button text update
+// updateButtonText();
 
 // Add an event listener for the button
 // makeRequestBtn.addEventListener("click", () => {
