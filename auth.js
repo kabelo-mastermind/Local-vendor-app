@@ -1,24 +1,10 @@
-// auth.js
-
-// Check if the supabase client is initialized
+// Check if the Supabase client is initialized
 if (!window.supabase) {
-    console.error("Supabase client is not initialized. Please check your supabase.js configuration.");
-    alert("Supabase client initialization fail.");
-  } else {
-    // Access the Supabase client from the global `window` object
-    const supabase = window.supabase;
-  // auth.js
-if (!window.supabase) {
-    console.error("Supabase client is not initialized.");
-    alert("Supabase client initialization failed.");
-  } else {
-    const supabase = window.supabase;
-  
-    // Now this should work
-    supabase.auth.onAuthStateChange((event, session) => {
-      console.log(event, session);
-    });
-  }
+  console.error("Supabase client is not initialized. Please check your supabase.js configuration.");
+  alert("Supabase client initialization failed.");
+} else {
+  // Access the Supabase client from the global `window` object
+  const supabase = window.supabase;
     // Sign-up form handler
     const signupForm = document.getElementById('signupModal');
     signupForm.addEventListener('submit', async (e) => {
