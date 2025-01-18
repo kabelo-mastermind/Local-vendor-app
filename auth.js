@@ -81,6 +81,7 @@ if (!window.supabase) {
       makeRequestBtn.textContent = makeRequestBtn.dataset.defaultText;
     }
   }
+  
 
   // Fetch session on initial load
   (async () => {
