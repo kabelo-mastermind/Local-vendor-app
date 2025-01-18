@@ -85,11 +85,10 @@ if (!window.supabase) {
       makeRequestBtn.removeEventListener("click", logRequestMade);
     }
   }
-  
+
   function logRequestMade() {
     console.log("Request made");
   }
-  
 
   // Fetch session on initial load
   (async () => {
@@ -97,6 +96,7 @@ if (!window.supabase) {
     currentUser = session?.user || null;
     updateButtonText();
   })();
+
 
   // Make request button event listener
   if (makeRequestBtn) {
