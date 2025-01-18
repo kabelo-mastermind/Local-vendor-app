@@ -44,7 +44,7 @@ if (!window.supabase) {
       alert(error.message);
     } else {
       alert("Sign-in successful!");
-      window.location.href = "index.html";
+      // window.location.href = "index.html";
     }
   });
 
