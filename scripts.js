@@ -139,16 +139,16 @@ function updateButtonText() {
 updateButtonText();
 
 // Add an event listener for the button
-makeRequestBtn.addEventListener("click", () => {
-  const user = supabase.auth.user();
-  if (user) {
-    console.log("User is logged in. Proceed to make a request.");
-    // Navigate or perform the action for making a request
-  } else {
-    console.log("User is not logged in. Please sign in first.");
-    // Optionally open the sign-in modal
-    document.getElementById("signinModal").style.display = "block";
-  }
-});
+// makeRequestBtn.addEventListener("click", () => {
+//   const user = supabase.auth.user();
+//   if (user) {
+//     console.log("User is logged in. Proceed to make a request.");
+//     // Navigate or perform the action for making a request
+//   } else {
+//     console.log("User is not logged in. Please sign in first.");
+//     // Optionally open the sign-in modal
+//     document.getElementById("signinModal").style.display = "block";
+//   }
+// });
 
 });
