@@ -45,6 +45,11 @@ if (!window.supabase) {
     } else {
       alert("Sign-in successful!");
       // window.location.href = "index.html";
+        // Close all modals
+    const modals = document.querySelectorAll(".modal");
+    modals.forEach((modal) => {
+      modal.style.display = "none";
+    });
     }
   });
 
