@@ -92,20 +92,22 @@ if (!window.supabase) {
   // Make request button event listener
   if (makeRequestBtn) {
     makeRequestBtn.addEventListener("click", (e) => {
-      e.preventDefault(); // Prevent default behavior, especially triggering unintended actions.
+      e.preventDefault(); // Prevent default action to stop unwanted behavior.
 
       if (currentUser) {
+        // Change behavior when logged in
         if (makeRequestBtn.textContent === makeRequestBtn.dataset.loggedInText) {
           console.log("requested");
-          // Disable further clicks if needed
-          makeRequestBtn.disabled = true; // Optional
-           // Show the sign-in modal only, not the sign-up modal
-        document.getElementById("signinModal").style.display = "block";
+          makeRequestBtn.disabled = true; // Optional: Prevent further clicks.
         }
       } else {
-        console.log("User is not logged in. Please sign in first.");
-        // Show the sign-in modal only, not the sign-up modal
-        // document.getElementById("signinModal").style.display = "block";
+        // Open signin modal when user is not logged in
+        const signinModal = document.getElementById("signinModal");
+        if (signinModal) {
+          signinModal.style.display = "block"; // Open only the signin modal
+        } else {
+          console.error("Signin modal not found!");
+        }
       }
     });
   }
