@@ -93,9 +93,13 @@ if (!window.supabase) {
   // Fetch session on initial load
   (async () => {
     const { data: session } = await supabase.auth.getSession();
-    currentUser = session?.user || null;
-    console.log("user3333333333", currentUser);
-    
+    if (session) {
+      currentUser = session.user;
+      console.log("User is logged in:", currentUser);
+    } else {
+      currentUser = null;
+      console.log("User is not logged in.");
+    }
     updateButtons();
   })();
 
