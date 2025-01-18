@@ -122,15 +122,33 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-     // Get the button element by its ID
-     const makeRequestBtn = document.getElementById("makeRequestBtn");
+ // Button and authentication listener
+const makeRequestBtn = document.getElementById("makeRequestBtn");
 
-     // Add an event listener to the button
-     makeRequestBtn.addEventListener("click", () => {
-         // Change the button text
-         makeRequestBtn.textContent = "Make a Request";
- 
-         // Log a message to the console
-         console.log("Request made");
-     });
+// Function to update button text based on login status
+function updateButtonText() {
+  const user = supabase.auth.user();
+  if (user) {
+    makeRequestBtn.textContent = makeRequestBtn.dataset.loggedInText;
+  } else {
+    makeRequestBtn.textContent = makeRequestBtn.dataset.defaultText;
+  }
+}
+
+// Initial button text update
+updateButtonText();
+
+// Add an event listener for the button
+makeRequestBtn.addEventListener("click", () => {
+  const user = supabase.auth.user();
+  if (user) {
+    console.log("User is logged in. Proceed to make a request.");
+    // Navigate or perform the action for making a request
+  } else {
+    console.log("User is not logged in. Please sign in first.");
+    // Optionally open the sign-in modal
+    document.getElementById("signinModal").style.display = "block";
+  }
+});
+
 });
