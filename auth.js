@@ -1,7 +1,20 @@
 // Use the Supabase client from the global window object
 const supabase = window.supabase;
 
-// Sign-up form
+if (!supabase || !supabase.auth) {
+  console.error("Supabase is not initialized. Please check your configuration.");
+} else {
+  // Listen to auth state changes
+  supabase.auth.onAuthStateChange((event, session) => {
+    console.log(event, session);
+    if (event === "SIGNED_OUT") {
+      console.log("User signed out");
+    } else if (event === "SIGNED_IN") {
+      console.log("User signed in");
+    }
+  });
+}
+
 const signupForm = document.getElementById('signupModal');
 signupForm.addEventListener('submit', async (e) => {
   e.preventDefault();
