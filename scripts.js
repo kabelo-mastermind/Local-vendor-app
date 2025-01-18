@@ -122,4 +122,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+     // Get the button element by its ID
+     const makeRequestBtn = document.getElementById("makeRequestBtn");
+
+     // Add an event listener to the button
+     makeRequestBtn.addEventListener("click", () => {
+         // Change the button text
+         makeRequestBtn.textContent = "Make a Request";
+ 
+         // Log a message to the console
+         console.log("Request made");
+     });
 });
