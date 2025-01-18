@@ -1,7 +1,5 @@
-// auth.js
-
-// Ensure the Supabase client is available
-const supabase = window.supabase;
+// Access the Supabase client from the global window object
+const supabase = window.supabase; // Do NOT redeclare it with `const` or `let`
 
 // Sign-up form
 const signupForm = document.getElementById('signupForm');
