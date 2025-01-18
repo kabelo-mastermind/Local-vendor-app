@@ -49,8 +49,6 @@ if (!window.supabase) {
       modals.forEach((modal) => {
         modal.style.display = "none";
       });
-      currentUser = user;
-      updateButtons();
     }
   });
 
@@ -63,8 +61,7 @@ if (!window.supabase) {
       alert(error.message);
     } else {
       alert("Signed out successfully!");
-      currentUser = null;
-      updateButtons();
+      window.location.href = "index.html";
     }
   });
 
@@ -73,16 +70,16 @@ if (!window.supabase) {
     if (event === "SIGNED_OUT") {
       currentUser = null;
     } else if (event === "SIGNED_IN") {
+      console.log("User session login", session.user);
       currentUser = session.user;
     }
     updateButtons();
   });
 
   // Button references
-  const getStartedBtn = document.querySelector(".btn-get-started");
-  const makeRequestBtn = document.querySelector(".btn-make-request");
+  const getStartedBtn = document.getElementById("getStartedBtn");
+  const makeRequestBtn = document.getElementById("makeRequestBtn");
 
-  // Update button visibility based on login status
   function updateButtons() {
     if (currentUser) {
       getStartedBtn.style.display = "none";
@@ -97,15 +94,26 @@ if (!window.supabase) {
   (async () => {
     const { data: session } = await supabase.auth.getSession();
     currentUser = session?.user || null;
+    console.log("user3333333333", currentUser);
+    
     updateButtons();
   })();
 
-  // "Make Request" button event listener
+  // Button event listeners
+  if (getStartedBtn) {
+    getStartedBtn.addEventListener("click", () => {
+      const modals = document.querySelectorAll(".modal");
+      modals.forEach((modal) => {
+        modal.style.display = "none";
+      });
+      document.getElementById("signinModal").style.display = "block";
+    });
+  }
+
   if (makeRequestBtn) {
     makeRequestBtn.addEventListener("click", () => {
-      if (currentUser) {
-        console.log("Request made!");
-      }
+      console.log("Request made");
+      // Add any additional logic here for handling the request
     });
   }
 }
