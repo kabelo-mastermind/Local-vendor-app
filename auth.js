@@ -73,7 +73,7 @@ if (!window.supabase) {
     }
   });
   // Button and authentication listener
-const makeRequestBtn = document.getElementById("makeRequestBtn");
+  const makeRequestBtn = document.getElementById("makeRequestBtn");
 
   // Add an event listener for the button
   makeRequestBtn.addEventListener("click", () => {
@@ -87,4 +87,18 @@ const makeRequestBtn = document.getElementById("makeRequestBtn");
       document.getElementById("signinModal").style.display = "block";
     }
   });
+
+
+  // Function to update button text based on login status
+  function updateButtonText() {
+    const user = supabase.auth.user();
+    if (user) {
+      makeRequestBtn.textContent = makeRequestBtn.dataset.loggedInText;
+    } else {
+      makeRequestBtn.textContent = makeRequestBtn.dataset.defaultText;
+    }
+  }
+
+  // Initial button text update
+  updateButtonText();
 }
