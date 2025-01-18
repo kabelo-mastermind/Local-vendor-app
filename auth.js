@@ -39,7 +39,6 @@ if (!window.supabase) {
       email: email,
       password: password,
     });
-    
 
     if (error) {
       alert(error.message);
@@ -68,7 +67,6 @@ if (!window.supabase) {
       currentUser = null;
     } else if (event === 'SIGNED_IN') {
       console.log("user session login", session.user);
-      
       currentUser = session.user;
     }
     updateButtonText();
@@ -78,16 +76,23 @@ if (!window.supabase) {
   const makeRequestBtn = document.getElementById("makeRequestBtn");
   function updateButtonText() {
     if (currentUser) {
-      makeRequestBtn.textContent = makeRequestBtn.dataset.loggedInText;
+      makeRequestBtn.textContent = 'Make Request';
+      makeRequestBtn.removeEventListener("click", handleNotLoggedIn);
       makeRequestBtn.addEventListener("click", logRequestMade);
     } else {
-      makeRequestBtn.textContent = makeRequestBtn.dataset.defaultText;
+      makeRequestBtn.textContent = 'Get Started';
       makeRequestBtn.removeEventListener("click", logRequestMade);
+      makeRequestBtn.addEventListener("click", handleNotLoggedIn);
     }
   }
 
   function logRequestMade() {
     console.log("Request made");
+  }
+
+  function handleNotLoggedIn() {
+    console.log("User is not logged in. Please sign in first.");
+    document.getElementById("signinModal").style.display = "block";
   }
 
   // Fetch session on initial load
@@ -97,16 +102,8 @@ if (!window.supabase) {
     updateButtonText();
   })();
 
-
-  // Make request button event listener
+  // Initial setup for not logged in state
   if (makeRequestBtn) {
-    makeRequestBtn.addEventListener("click", () => {
-      if (currentUser) {
-        console.log("User is logged in. Proceed to make a request.");
-      } else {
-        console.log("User is not logged in. Please sign in first.");
-        document.getElementById("signinModal").style.display = "block";
-      }
-    });
+    makeRequestBtn.addEventListener("click", handleNotLoggedIn);
   }
 }
