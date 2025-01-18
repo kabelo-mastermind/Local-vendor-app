@@ -99,11 +99,13 @@ if (!window.supabase) {
           console.log("requested");
           // Disable further clicks if needed
           makeRequestBtn.disabled = true; // Optional
+           // Show the sign-in modal only, not the sign-up modal
+        document.getElementById("signinModal").style.display = "block";
         }
       } else {
         console.log("User is not logged in. Please sign in first.");
         // Show the sign-in modal only, not the sign-up modal
-        document.getElementById("signinModal").style.display = "block";
+        // document.getElementById("signinModal").style.display = "block";
       }
     });
   }
