@@ -67,6 +67,8 @@ if (!window.supabase) {
     if (event === 'SIGNED_OUT') {
       currentUser = null;
     } else if (event === 'SIGNED_IN') {
+      console.log("user session login", session.user);
+      
       currentUser = session.user;
     }
     updateButtonText();
