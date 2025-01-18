@@ -62,14 +62,16 @@ if (!window.supabase) {
         window.location.href = 'index.html'; // Redirect after sign-out
       }
     });
-  
+    let currentUser = null;
     // Listen to authentication state changes
     supabase.auth.onAuthStateChange((event, session) => {
       console.log(event, session);
       if (event === 'SIGNED_OUT') {
         console.log('User signed out');
+        currentUser = null; // Clear the user
       } else if (event === 'SIGNED_IN') {
         console.log('User signed in');
+        currentUser = session.user; // Store the user
       }
     });
     
