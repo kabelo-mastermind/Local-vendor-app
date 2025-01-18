@@ -1,20 +1,15 @@
-// Use the Supabase client from the global window object
+// auth.js
+
+// Access the Supabase client from the global `window` object
 const supabase = window.supabase;
 
 if (!supabase || !supabase.auth) {
-  console.error("Supabase is not initialized. Please check your configuration.");
-} else {
-  // Listen to auth state changes
-  supabase.auth.onAuthStateChange((event, session) => {
-    console.log(event, session);
-    if (event === "SIGNED_OUT") {
-      console.log("User signed out");
-    } else if (event === "SIGNED_IN") {
-      console.log("User signed in");
-    }
-  });
+  console.error("Supabase client is not initialized. Please check your supabase.js configuration.");
+  // Optional: Exit early if supabase is not available
+  return;
 }
 
+// Sign-up form
 const signupForm = document.getElementById('signupModal');
 signupForm.addEventListener('submit', async (e) => {
   e.preventDefault();
