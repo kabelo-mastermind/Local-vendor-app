@@ -68,6 +68,8 @@ if (!window.supabase) {
   supabase.auth.onAuthStateChange(async (event, session) => {
     if (session) {
       currentUser = session.user; // Store the user
+      console.log('user logged----------',currentUser);
+      
     } else {
       currentUser = null;
     }
