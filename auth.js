@@ -1,8 +1,10 @@
-// main.js or your main script file
-import { supabase } from './supabase.js'; // Correct import
+// auth.js
+
+// Ensure the Supabase client is available
+const supabase = window.supabase;
 
 // Sign-up form
-const signupForm = document.getElementById('signupModal');
+const signupForm = document.getElementById('signupForm');
 signupForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const name = document.getElementById('name').value;
@@ -19,11 +21,11 @@ signupForm.addEventListener('submit', async (e) => {
 });
 
 // Sign-in form
-const signinForm = document.getElementById('signinModal');
+const signinForm = document.getElementById('signinForm');
 signinForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
+  const email = document.getElementById('signinEmail').value;
+  const password = document.getElementById('signinPassword').value;
 
   const { session, error } = await supabase.auth.signIn({ email, password });
 
