@@ -122,4 +122,33 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+ // Button and authentication listener
+const makeRequestBtn = document.getElementById("makeRequestBtn");
+
+// Function to update button text based on login status
+function updateButtonText() {
+  const user = supabase.auth.user();
+  if (user) {
+    makeRequestBtn.textContent = makeRequestBtn.dataset.loggedInText;
+  } else {
+    makeRequestBtn.textContent = makeRequestBtn.dataset.defaultText;
+  }
+}
+
+// Initial button text update
+updateButtonText();
+
+// Add an event listener for the button
+makeRequestBtn.addEventListener("click", () => {
+  const user = supabase.auth.user();
+  if (user) {
+    console.log("User is logged in. Proceed to make a request.");
+    // Navigate or perform the action for making a request
+  } else {
+    console.log("User is not logged in. Please sign in first.");
+    // Optionally open the sign-in modal
+    document.getElementById("signinModal").style.display = "block";
+  }
+});
+
 });
