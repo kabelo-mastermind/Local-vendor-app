@@ -1,5 +1,7 @@
-import { supabase } from './supabase.js';
+// main.js or your main script file
+import { supabase } from './supabase.js'; // Correct import
 
+// Sign-up form
 const signupForm = document.getElementById('signupModal');
 signupForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -7,7 +9,7 @@ signupForm.addEventListener('submit', async (e) => {
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
 
-  const { user, error } = await supabase.auth.signUp({ email, password, name });
+  const { user, error } = await supabase.auth.signUp({ email, password });
 
   if (error) {
     alert(error.message);
@@ -15,7 +17,8 @@ signupForm.addEventListener('submit', async (e) => {
     alert('Sign-up successful! Please check your email to confirm your account.');
   }
 });
-// sign in
+
+// Sign-in form
 const signinForm = document.getElementById('signinModal');
 signinForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -31,10 +34,12 @@ signinForm.addEventListener('submit', async (e) => {
     window.location.href = 'index.html';
   }
 });
-// sign out
+
+// Sign-out button
 const signoutBtn = document.getElementById('sign-out');
 signoutBtn.addEventListener('click', async () => {
   const { error } = await supabase.auth.signOut();
+
   if (error) {
     alert(error.message);
   } else {
