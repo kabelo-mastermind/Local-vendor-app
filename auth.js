@@ -3,7 +3,7 @@
 // Check if the supabase client is initialized
 if (!window.supabase) {
     console.error("Supabase client is not initialized. Please check your supabase.js configuration.");
-    alert("Supabase client initialization failed.");
+    alert("Supabase client initialization fail.");
   } else {
     // Access the Supabase client from the global `window` object
     const supabase = window.supabase;
