@@ -44,12 +44,13 @@ if (!window.supabase) {
       alert(error.message);
     } else {
       alert("Sign-in successful!");
-      // window.location.href = "index.html";
-        // Close all modals
-    const modals = document.querySelectorAll(".modal");
-    modals.forEach((modal) => {
-      modal.style.display = "none";
-    });
+      // Close all modals
+      const modals = document.querySelectorAll(".modal");
+      modals.forEach((modal) => {
+        modal.style.display = "none";
+      });
+      currentUser = user;
+      updateButtons();
     }
   });
 
@@ -62,7 +63,8 @@ if (!window.supabase) {
       alert(error.message);
     } else {
       alert("Signed out successfully!");
-      window.location.href = "index.html";
+      currentUser = null;
+      updateButtons();
     }
   });
 
@@ -71,50 +73,38 @@ if (!window.supabase) {
     if (event === "SIGNED_OUT") {
       currentUser = null;
     } else if (event === "SIGNED_IN") {
-      console.log("User session login", session.user);
       currentUser = session.user;
     }
-    updateButtonText();
+    updateButtons();
   });
 
-  // Button reference and text update
-  const makeRequestBtn = document.getElementById("makeRequestBtn");
-  function updateButtonText() {
-    if (currentUser) {
-      makeRequestBtn.textContent = makeRequestBtn.dataset.loggedInText;
-    } else {
-      makeRequestBtn.textContent = makeRequestBtn.dataset.defaultText;
-    }
+  // Button references
+  const getStartedBtn = document.querySelector(".btn-get-started");
+  const makeRequestBtn = document.querySelector(".btn-make-request");
 
-    // Force DOM repaint to apply the text change immediately
-    makeRequestBtn.style.display = "none";
-    makeRequestBtn.offsetHeight; // Trigger reflow
-    makeRequestBtn.style.display = "inline-block";
+  // Update button visibility based on login status
+  function updateButtons() {
+    if (currentUser) {
+      getStartedBtn.style.display = "none";
+      makeRequestBtn.style.display = "inline-block";
+    } else {
+      getStartedBtn.style.display = "inline-block";
+      makeRequestBtn.style.display = "none";
+    }
   }
 
   // Fetch session on initial load
   (async () => {
     const { data: session } = await supabase.auth.getSession();
     currentUser = session?.user || null;
-    updateButtonText();
+    updateButtons();
   })();
 
-  // Make request button event listener
+  // "Make Request" button event listener
   if (makeRequestBtn) {
-    makeRequestBtn.addEventListener("click", (e) => {
-      e.preventDefault(); // Prevent default action to stop unwanted behavior.
-
+    makeRequestBtn.addEventListener("click", () => {
       if (currentUser) {
-        // Change behavior when logged in
-        if (makeRequestBtn.textContent === makeRequestBtn.dataset.loggedInText) {
-          console.log("requested");
-          makeRequestBtn.disabled = true; // Optional: Prevent further clicks.
-        }
-      } else {
-        const modals = document.querySelectorAll(".modal");
-        modals.forEach((modal) => {
-          modal.style.display = "none";
-        });
+        console.log("Request made!");
       }
     });
   }
