@@ -111,13 +111,10 @@ if (!window.supabase) {
           makeRequestBtn.disabled = true; // Optional: Prevent further clicks.
         }
       } else {
-        // Open signin modal when user is not logged in
-        const signinModal = document.getElementById("signinModal");
-        if (signinModal) {
-          signinModal.style.display = "block"; // Open only the signin modal
-        } else {
-          console.error("Signin modal not found!");
-        }
+        const modals = document.querySelectorAll(".modal");
+        modals.forEach((modal) => {
+          modal.style.display = "none";
+        });
       }
     });
   }
