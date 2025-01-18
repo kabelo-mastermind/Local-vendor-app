@@ -14,6 +14,9 @@
     <!-- Map -->
     <link rel="stylesheet" href="./assets/leaflet/leaflet.css" />
     <script src="./assets/leaflet/leaflet.js"></script>
+    <!--supabase  -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
 </head>
 
 
@@ -33,7 +36,7 @@
                         <li><a href="./index.html">Home</a></li>
                         <li><a href="#" id="openMap">Requests</a><span class="notification">1</span></li>
                         <!-- Changed link to trigger scroll -->
-                        <li><a href="#" class="sign-out">Sign in</a></li>
+                        <li><a href="#"id="sign-out" class="sign-out">Sign out</a></li>
                     </ul>
                 </div>
                 <div class="menu-icon">
@@ -158,6 +161,7 @@
 
 
     <script src="./scripts.js"></script>
+    <script type="module" src="./auth.js"></script>
 
 
 </body>
