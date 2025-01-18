@@ -63,21 +63,22 @@ if (!window.supabase) {
     }
   });
 
-  // Listen to authentication state changes
-  supabase.auth.onAuthStateChange((event, session) => {
-    console.log(event, session);
-    if (event === 'SIGNED_OUT') {
-      console.log('User signed out');
-    } else if (event === 'SIGNED_IN') {
-      console.log('User signed in');
+  let currentUser = null;
+
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    if (session) {
+      currentUser = session.user; // Store the user
+    } else {
+      currentUser = null;
     }
+    updateButtonText(); // Update button text when the auth state changes
   });
   // Button and authentication listener
   const makeRequestBtn = document.getElementById("makeRequestBtn");
 
   // Add an event listener for the button
-  makeRequestBtn.addEventListener("click", () => {
-    const user = supabase.auth.user();
+  makeRequestBtn.addEventListener("click", async () => {
+    const { data: user } = await supabase.auth.getUser();
     if (user) {
       console.log("User is logged in. Proceed to make a request.");
       // Navigate or perform the action for making a request
@@ -87,18 +88,13 @@ if (!window.supabase) {
       document.getElementById("signinModal").style.display = "block";
     }
   });
+  
 
-
-  // Function to update button text based on login status
   function updateButtonText() {
-    const user = supabase.auth.user();
-    if (user) {
+    if (currentUser) {
       makeRequestBtn.textContent = makeRequestBtn.dataset.loggedInText;
     } else {
       makeRequestBtn.textContent = makeRequestBtn.dataset.defaultText;
     }
   }
-
-  // Initial button text update
-  updateButtonText();
 }
