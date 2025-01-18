@@ -7,7 +7,18 @@ if (!window.supabase) {
   } else {
     // Access the Supabase client from the global `window` object
     const supabase = window.supabase;
+  // auth.js
+if (!window.supabase) {
+    console.error("Supabase client is not initialized.");
+    alert("Supabase client initialization failed.");
+  } else {
+    const supabase = window.supabase;
   
+    // Now this should work
+    supabase.auth.onAuthStateChange((event, session) => {
+      console.log(event, session);
+    });
+  }
     // Sign-up form handler
     const signupForm = document.getElementById('signupModal');
     signupForm.addEventListener('submit', async (e) => {
