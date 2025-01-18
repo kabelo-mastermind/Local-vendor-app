@@ -93,6 +93,8 @@ if (!window.supabase) {
   function handleNotLoggedIn() {
     console.log("User is not logged in. Please sign in first.");
     document.getElementById("signinModal").style.display = "block";
+    document.getElementById("signupModal").style.display = "block";
+
   }
 
   // Fetch session on initial load
