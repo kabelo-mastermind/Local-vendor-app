@@ -1,66 +1,76 @@
-// Check if Supabase client is initialized
+// Check if the Supabase client is initialized
 if (!window.supabase) {
   console.error("Supabase client is not initialized. Please check your supabase.js configuration.");
   alert("Supabase client initialization failed.");
 } else {
+  // Access the Supabase client from the global `window` object
   const supabase = window.supabase;
-
-  // Listen for sign-up form submission
-  const signupForm = document.getElementById("signupForm");
-  signupForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { name } },
+    // Sign-up form handler
+    const signupForm = document.getElementById('signupModal');
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+  
+      const { user, session, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            name: name,
+          },
+        },
+      });
+  
+      if (error) {
+        alert(error.message);
+      } else {
+        alert('Sign-up successful! Please check your email to confirm your account.');
+      }
     });
-
-    if (error) {
-      alert(error.message);
-    } else {
-      alert("Sign-up successful! Please check your email to confirm.");
-    }
-  });
-
-  // Listen for sign-in form submission
-  const signinForm = document.getElementById("signinForm");
-  signinForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("signinEmail").value;
-    const password = document.getElementById("signinPassword").value;
-
-    const { error } = await supabase.auth.signIn({ email, password });
-
-    if (error) {
-      alert(error.message);
-    } else {
-      alert("Sign-in successful!");
-      window.location.reload(); // Reload to update the button text
-    }
-  });
-
-  // Handle sign-out
-  const signoutBtn = document.getElementById("sign-out");
-  signoutBtn.addEventListener("click", async () => {
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      alert(error.message);
-    } else {
-      alert("Signed out successfully!");
-      window.location.reload(); // Reload to reset the button text
-    }
-  });
-
-  // Listen for auth state changes
-  supabase.auth.onAuthStateChange((event, session) => {
-    console.log(event, session);
-    if (event === "SIGNED_IN" || event === "SIGNED_OUT") {
-      updateButtonText(); // Update the button text dynamically
-    }
-  });
-}
+  
+    // Sign-in form handler
+    const signinForm = document.getElementById('signinModal');
+    signinForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('signinEmail').value;
+      const password = document.getElementById('signinPassword').value;
+  
+      const { user, session, error } = await supabase.auth.signIn({
+        email: email,
+        password: password,
+      });
+  
+      if (error) {
+        alert(error.message);
+      } else {
+        alert('Sign-in successful!');
+        window.location.href = 'index.html'; // Redirect after successful sign-in
+      }
+    });
+  
+    // Sign-out button handler
+    const signoutBtn = document.getElementById('sign-out');
+    signoutBtn.addEventListener('click', async () => {
+      const { error } = await supabase.auth.signOut();
+  
+      if (error) {
+        alert(error.message);
+      } else {
+        alert('Signed out successfully!');
+        window.location.href = 'index.html'; // Redirect after sign-out
+      }
+    });
+  
+    // Listen to authentication state changes
+    supabase.auth.onAuthStateChange((event, session) => {
+      console.log(event, session);
+      if (event === 'SIGNED_OUT') {
+        console.log('User signed out');
+      } else if (event === 'SIGNED_IN') {
+        console.log('User signed in');
+      }
+    });
+  }
+  
