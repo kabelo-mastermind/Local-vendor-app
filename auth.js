@@ -242,18 +242,17 @@ makeRequestBtn.addEventListener("click", async () => {
   }
 });
 
-// Fetch and plot locations for non-signed-up users
-async function fetchAndPlotAnonymousLocations() {
+// Fetch and plot coordinates on the map
+async function fetchAndPlotLocations() {
   try {
-    // Fetch locations where there is no associated user in the 'clients' table
     const { data: locations, error } = await supabase
       .from("current_locations")
       .select("latitude, longitude")
-      .is("user_id", null); // User ID is null for non-signed-up users
+
 
     if (error) {
-      console.error("Error fetching locations for non-signed-up users:", error.message);
-      alert("Failed to load locations for non-signed-up users.");
+      console.error("Error fetching locations:", error.message);
+      alert("Failed to load your locations.");
       return;
     }
 
@@ -264,67 +263,13 @@ async function fetchAndPlotAnonymousLocations() {
       }
     });
 
-    // Plot the non-signed-up users' location(s) on the map
+    // Plot the user's location(s) on the map
     locations.forEach((location) => {
       const { latitude, longitude } = location;
 
       L.marker([latitude, longitude], {
         icon: L.icon({
-          iconUrl: "./assets/markers/anonymous.jpg", // Different marker for anonymous users
-          iconSize: [30, 38],
-          iconAnchor: [15, 50],
-          popupAnchor: [0, -50],
-        }),
-      })
-        .addTo(map)
-        .bindPopup("<b>Anonymous User Location</b>");
-    });
-  } catch (err) {
-    console.error("Error fetching locations:", err.message);
-    alert("An error occurred while fetching locations.");
-  }
-}
-
-// Fetch and plot locations for both signed-up and non-signed-up users
-async function fetchAndPlotAllLocations() {
-  try {
-    // Fetch locations for signed-up users
-    const { data: signedUpLocations, error: signedUpError } = await supabase
-      .from("current_locations")
-      .select("latitude, longitude")
-      .neq("user_id", null); // Only locations where user_id is not null
-
-    if (signedUpError) {
-      console.error("Error fetching signed-up locations:", signedUpError.message);
-      alert("Failed to load signed-up user locations.");
-      return;
-    }
-
-    // Fetch locations for non-signed-up users
-    const { data: anonymousLocations, error: anonymousError } = await supabase
-      .from("current_locations")
-      .select("latitude, longitude")
-      .is("user_id", null); // Only locations where user_id is null
-
-    if (anonymousError) {
-      console.error("Error fetching anonymous locations:", anonymousError.message);
-      alert("Failed to load anonymous user locations.");
-      return;
-    }
-
-    // Clear existing markers before plotting new ones
-    map.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
-        map.removeLayer(layer);
-      }
-    });
-
-    // Plot locations of signed-up users
-    signedUpLocations.forEach((location) => {
-      const { latitude, longitude } = location;
-      L.marker([latitude, longitude], {
-        icon: L.icon({
-          iconUrl: "./assets/markers/customer.jpg", // Marker for signed-up users
+          iconUrl: "./assets/markers/customer.jpg",
           iconSize: [30, 38],
           iconAnchor: [15, 50],
           popupAnchor: [0, -50],
@@ -333,25 +278,9 @@ async function fetchAndPlotAllLocations() {
         .addTo(map)
         .bindPopup("<b>Customer Location</b>");
     });
-
-    // Plot locations of non-signed-up users
-    anonymousLocations.forEach((location) => {
-      const { latitude, longitude } = location;
-      L.marker([latitude, longitude], {
-        icon: L.icon({
-          iconUrl: "./assets/markers/anonymous.jpg", // Marker for non-signed-up users
-          iconSize: [30, 38],
-          iconAnchor: [15, 50],
-          popupAnchor: [0, -50],
-        }),
-      })
-        .addTo(map)
-        .bindPopup("<b>Anonymous User Location</b>");
-    });
-
   } catch (err) {
-    console.error("Error fetching all locations:", err.message);
-    alert("An error occurred while fetching all locations.");
+    console.error("Error fetching locations:", err.message);
+    alert("An error occurred while fetching your locations.");
   }
 }
 
@@ -362,9 +291,8 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
 }).addTo(map);
 
-// Fetch and plot locations for both signed-up and non-signed-up users on map
-fetchAndPlotAllLocations();
-
+// Fetch and plot locations on map at the beginning
+fetchAndPlotLocations();
 
 
 }
