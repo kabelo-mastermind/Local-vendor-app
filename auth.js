@@ -61,7 +61,7 @@ if (!window.supabase) {
       alert(error.message);
     } else {
       alert("Signed out successfully!");
-      window.location.href = "index.html";
+      window.location.href = "https://zambane.netlify.app/";
     }
   });
 
@@ -141,6 +141,7 @@ forgotPasswordForm.addEventListener("submit", async (e) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: "https://zambane.netlify.app/", // Update this URL
     });
+    
 
     if (error) {
       throw new Error(error.message);
