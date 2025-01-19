@@ -9,29 +9,50 @@ if (!window.supabase) {
   const saveUserData = async (user) => {
     try {
       const { id, user_metadata, email } = user;
-  
+
       const userData = {
         id,
         name: user_metadata?.name || "Anonymous",
         email,
       };
-  
+
       console.log("Saving user data:", userData);
-  
+
       const { data, error } = await supabase.from("clients").upsert([userData]);
-  
-      console.log("Upsert response:", { data, error });
-  
+
       if (error) {
         console.error("Upsert failed:", error.message);
+        return false;
       } else {
-        console.log("Upsert successful:", data);
+        console.log("User saved in 'clients':", data);
+        return true;
       }
     } catch (err) {
       console.error("Error in saveUserData:", err.message);
+      return false;
     }
   };
-  
+
+  // Listen for authentication state changes
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    if (event === "SIGNED_IN" && session?.user) {
+      currentUser = session.user;
+      console.log("User signed in:", currentUser);
+
+      // Save the user in the 'clients' table after email confirmation
+      const success = await saveUserData(currentUser);
+      if (success) {
+        console.log("User data saved successfully after email confirmation.");
+      } else {
+        console.error("Failed to save user data after email confirmation.");
+      }
+      updateButtons();
+    } else if (event === "SIGNED_OUT") {
+      console.log("User signed out.");
+      currentUser = null;
+      updateButtons();
+    }
+  });
 
   // Sign-up form handler
   const signupForm = document.getElementById("signupModal");
@@ -44,15 +65,14 @@ if (!window.supabase) {
 
     try {
       const { user, error } = await supabase.auth.signUp({
-        email: email,
-        password: password,
+        email,
+        password,
         options: { data: { name } },
       });
 
       if (error) throw new Error(error.message);
 
       alert("Sign-up successful! Please check your email to confirm your account.");
-      if (user && user.id) await saveUserData(user, name);
     } catch (err) {
       console.error("Sign-up error:", err.message);
       alert(err.message);
@@ -73,7 +93,6 @@ if (!window.supabase) {
       if (error) throw new Error(error.message);
 
       alert("Sign-in successful!");
-      if (user && user.id) await saveUserData(user, user.user_metadata.name);
     } catch (err) {
       console.error("Sign-in error:", err.message);
       alert(err.message);
@@ -87,7 +106,8 @@ if (!window.supabase) {
       const { error } = await supabase.auth.signOut();
       if (error) throw new Error(error.message);
 
-      clearSessionData();
+      currentUser = null;
+      console.log("User signed out successfully.");
       alert("Signed out successfully!");
       window.location.href = "https://zambane.netlify.app/";
     } catch (err) {
@@ -95,12 +115,6 @@ if (!window.supabase) {
       alert(err.message);
     }
   });
-
-  // Clear session data
-  function clearSessionData() {
-    currentUser = null;
-    console.log("Session data cleared");
-  }
 
   // Update UI buttons based on authentication state
   function updateButtons() {
@@ -114,46 +128,6 @@ if (!window.supabase) {
       getStartedBtn.style.display = "inline-block";
       makeRequestBtn.style.display = "none";
     }
-  }
-
-  // Location save function
-  async function saveLocation(latitude, longitude) {
-    try {
-      const { data, error } = await supabase
-        .from("current_locations")
-        .insert([
-          {
-            user_id: currentUser.id,
-            latitude: latitude,
-            longitude: longitude,
-          },
-        ]);
-
-      if (error) throw new Error(error.message);
-      console.log("Location data saved successfully:", data);
-      alert("Your location has been saved successfully.");
-    } catch (err) {
-      console.error("Error saving location data:", err.message);
-      alert("Failed to save your location. Please try again.");
-    }
-  }
-
-  // Geolocation handling
-  const makeRequestBtn = document.getElementById("makeRequestBtn");
-  if (makeRequestBtn) {
-    makeRequestBtn.addEventListener("click", () => {
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => saveLocation(position.coords.latitude, position.coords.longitude),
-          (error) => {
-            console.error("Error getting location:", error.message);
-            alert("Unable to retrieve your location. Please try again.");
-          }
-        );
-      } else {
-        alert("Geolocation is not available in your browser.");
-      }
-    });
   }
 
   // Fetch current session on page load
@@ -175,6 +149,7 @@ if (!window.supabase) {
       console.error("Error fetching session:", err.message);
     }
   })();
+
 
   // Map initialization
   const map = L.map("map").setView([-25.5416, 28.0992], 13); // Centered in Soshanguve
