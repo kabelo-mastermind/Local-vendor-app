@@ -4,6 +4,26 @@ if (!window.supabase) {
 } else {
   const supabase = window.supabase;
   let currentUser = null;
+  let userLocation = null;
+
+  // Function to fetch current location
+  const fetchUserLocation = () => {
+    return new Promise((resolve, reject) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            resolve({ latitude, longitude });
+          },
+          (error) => {
+            reject(`Error fetching location: ${error.message}`);
+          }
+        );
+      } else {
+        reject("Geolocation is not supported by this browser.");
+      }
+    });
+  };
 
   // Sign-up form handler
   const signupForm = document.getElementById("signupModal");
@@ -29,50 +49,59 @@ if (!window.supabase) {
   });
 
   // Sign-in form handler
-  const signinForm = document.getElementById("signinModal");
-  signinForm.addEventListener("submit", async (e) => {
+  signupForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = document.getElementById("signinEmail").value;
-    const password = document.getElementById("signinPassword").value;
 
-    const { user, session, error } = await supabase.auth.signInWithPassword({
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    // Create a new user in Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email: email,
       password: password,
     });
 
-    if (error) {
-      alert(error.message);
+    if (authError) {
+      alert(authError.message);
+      return;
+    }
+
+    // Insert user data into the 'users' table
+    const { error: dbError } = await supabase.from("users").insert([
+      {
+        id: authData.user.id, // Use the user's unique ID from Supabase Auth
+        name: name,
+        email: email,
+      },
+    ]);
+
+    if (dbError) {
+      alert(`Database error: ${dbError.message}`);
     } else {
-      alert("Sign-in successful!");
-      // Close all modals
-      const modals = document.querySelectorAll(".modal");
-      modals.forEach((modal) => {
-        modal.style.display = "none";
-      });
+      alert("Sign-up successful! Please check your email to confirm your account.");
     }
   });
 
-   // Sign-out button handler
-   const signoutBtn = document.getElementById('sign-out');
-   signoutBtn.addEventListener('click', async () => {
-     const { error } = await supabase.auth.signOut();
- 
-     if (error) {
-       alert(error.message);
-     } else {
-       clearSessionData();
-       alert('Signed out successfully!');
-       window.location.href = 'https://zambane.netlify.app/';
-     }
-   });
- 
-   // Clear session data
-   function clearSessionData() {
-     currentUser = null;
-     // Clear any other session-related data here
-     console.log('Session data cleared');
-   }
- 
+  // Sign-out button handler
+  const signoutBtn = document.getElementById("sign-out");
+  signoutBtn.addEventListener("click", async () => {
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      alert(error.message);
+    } else {
+      clearSessionData();
+      alert("Signed out successfully!");
+      window.location.href = "https://zambane.netlify.app/";
+    }
+  });
+
+  // Clear session data
+  function clearSessionData() {
+    currentUser = null;
+    console.log("Session data cleared");
+  }
 
   // Authentication state change listener
   supabase.auth.onAuthStateChange((event, session) => {
@@ -93,6 +122,14 @@ if (!window.supabase) {
     if (currentUser) {
       getStartedBtn.style.display = "none";
       makeRequestBtn.style.display = "inline-block";
+
+      // Fetch user's current location on login
+      fetchUserLocation()
+        .then((location) => {
+          userLocation = location;
+          console.log("User location fetched:", userLocation);
+        })
+        .catch((err) => console.error(err));
     } else {
       getStartedBtn.style.display = "inline-block";
       makeRequestBtn.style.display = "none";
@@ -105,6 +142,14 @@ if (!window.supabase) {
     if (session) {
       currentUser = session.user;
       console.log("User is logged in:", currentUser);
+
+      // Fetch user's current location
+      fetchUserLocation()
+        .then((location) => {
+          userLocation = location;
+          console.log("User location fetched:", userLocation);
+        })
+        .catch((err) => console.error(err));
     } else {
       currentUser = null;
       console.log("User is not logged in.");
@@ -112,110 +157,35 @@ if (!window.supabase) {
     updateButtons();
   })();
 
-  // Button event listeners
-  if (getStartedBtn) {
-    getStartedBtn.addEventListener("click", () => {
-      const modals = document.querySelectorAll(".modal");
-      modals.forEach((modal) => {
-        modal.style.display = "none";
-      });
-      document.getElementById("signinModal").style.display = "block";
-    });
-  }
-
+  // Handle Make Request button click
   if (makeRequestBtn) {
-    makeRequestBtn.addEventListener("click", () => {
-      console.log("Request made successfully");
-      // Add any additional logic here for handling the request
+    makeRequestBtn.addEventListener("click", async () => {
+      if (!userLocation) {
+        alert("Unable to fetch your location. Please enable location services and try again.");
+        return;
+      }
+
+      try {
+        const { latitude, longitude } = userLocation;
+        const { error } = await supabase.from("locations").insert([
+          {
+            user_id: currentUser.id,
+            latitude: latitude,
+            longitude: longitude,
+          },
+        ]);
+
+        if (error) {
+          console.error("Error saving location:", error.message);
+          alert("Failed to save location. Please try again.");
+        } else {
+          console.log("Location saved successfully!");
+          alert("Request made successfully!");
+        }
+      } catch (err) {
+        console.error("Error:", err);
+        alert("An unexpected error occurred.");
+      }
     });
   }
-
-
-// // Forgot Password Form Handler
-// const forgotPasswordForm = document.getElementById("forgotPasswordForm");
-// forgotPasswordForm.addEventListener("submit", async (e) => {
-//   e.preventDefault();
-//   const email = document.getElementById("ForgotPasswordEmail").value.trim();
-//   const messageDiv = document.getElementById("ForgotPasswordMessage");
-
-//   if (!email) {
-//     messageDiv.style.display = "block";
-//     messageDiv.textContent = "Please enter your valid email address.";
-//     messageDiv.style.color = "red";
-//     return;
-//   }
-
-//   try {
-//     // Send password reset email
-//     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-//       redirectTo: "https://zambane.netlify.app/", // Update this URL
-//     });
-    
-
-//     if (error) {
-//       throw new Error(error.message);
-//     }
-
-//     // Success message
-//     messageDiv.style.display = "block";
-//     messageDiv.textContent = "Password reset email sent! Please check your inbox.";
-//     messageDiv.style.color = "green";
-
-//     // Clear form
-//     forgotPasswordForm.reset();
-//   } catch (err) {
-//     // Error message
-//     messageDiv.style.display = "block";
-//     messageDiv.textContent = `Error: ${err.message}`;
-//     messageDiv.style.color = "red";
-//   }
-// });
-
-// // Close modal on close button click for Forgot Password modal
-// document.querySelector("#ForgotPassword .close-btn").addEventListener("click", () => {
-//   document.getElementById("ForgotPassword").style.display = "none";
-// });
-
-// // Reset Password
-// document.addEventListener("DOMContentLoaded", async () => {
-//   const urlParams = new URLSearchParams(window.location.search);
-//   const accessToken = urlParams.get("access_token");
-
-//   if (accessToken) {
-//     // Valid token found, show the reset password modal
-//     const resetPasswordModal = document.querySelector(".reset-password-container");
-//     resetPasswordModal.style.display = "flex";
-
-//     // Handle password reset logic here
-//     const resetPasswordForm = document.getElementById("resetPasswordForm");
-//     resetPasswordForm.addEventListener("submit", async (event) => {
-//       event.preventDefault();
-//       const newPassword = document.getElementById("newPassword").value;
-//       const confirmPassword = document.getElementById("confirmPassword").value;
-//       const resetMessage = document.getElementById("resetMessage");
-
-//       if (newPassword !== confirmPassword) {
-//         resetMessage.innerText = "Passwords do not match.";
-//         resetMessage.style.color = "red";
-//         return;
-//       }
-
-//       const { error } = await supabase.auth.updateUser({ password: newPassword });
-//       if (error) {
-//         resetMessage.innerText = error.message;
-//         resetMessage.style.color = "red";
-//       } else {
-//         resetMessage.innerText = "Password updated successfully!";
-//         resetMessage.style.color = "green";
-//         setTimeout(() => {
-//           resetPasswordModal.style.display = "none";
-//           window.location.href = "https://zambane.netlify.app/"; // Redirect to homepage after reset
-//         }, 2000);
-//       }
-//     });
-//   } else {
-//     // No access token in URL, maybe handle error or redirect to login page
-//     console.log("Access token is missing");
-//   }
-// });
 }
