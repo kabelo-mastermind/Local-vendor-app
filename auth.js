@@ -171,10 +171,10 @@ forgotPasswordForm.addEventListener("submit", async (e) => {
   }
 });
 
-// // Close modal on close button click for Forgot Password modal
-// document.querySelector("#ForgotPassword .close-btn").addEventListener("click", () => {
-//   document.getElementById("ForgotPassword").style.display = "none";
-// });
+// Close modal on close button click for Forgot Password modal
+document.querySelector("#ForgotPassword .close-btn").addEventListener("click", () => {
+  document.getElementById("ForgotPassword").style.display = "none";
+});
 
 // Reset Password
 document.addEventListener("DOMContentLoaded", async () => {
