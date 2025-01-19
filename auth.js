@@ -138,43 +138,46 @@ signinForm.addEventListener("submit", async (e) => {
     }
   });
 
-// Update UI buttons based on authentication state
-function updateButtons() {
-  const getStartedBtn = document.getElementById("getStartedBtn");
-  const makeRequestBtn = document.getElementById("makeRequestBtn");
 
-  if (!getStartedBtn || !makeRequestBtn) {
-    console.error("Buttons not found in the DOM. Ensure the button IDs are correct.");
-    return;
-  }
+  // Update UI buttons based on authentication state
+  function updateButtons() {
+    const getStartedBtn = document.getElementById("getStartedBtn");
+    const makeRequestBtn = document.getElementById("makeRequestBtn");
 
-  if (currentUser) {
-    getStartedBtn.style.display = "none"; // Hide "Get Started" button
-    makeRequestBtn.style.display = "inline-block"; // Show "Make Request" button
-  } else {
-    getStartedBtn.style.display = "inline-block"; // Show "Get Started" button
-    makeRequestBtn.style.display = "none"; // Hide "Make Request" button
-  }
-}
- // Call updateButtons on page load to ensure the correct buttons are shown based on the current user
-(async () => {
-  try {
-    const { data: { session }, error } = await supabase.auth.getSession();
-    if (error) throw new Error(error.message);
-
-    if (session) {
-      currentUser = session.user;
-      console.log("User is logged in:", currentUser);
-    } else {
-      currentUser = null;
-      console.log("User is not logged in.");
+    if (!getStartedBtn || !makeRequestBtn) {
+      console.error("Buttons not found in the DOM. Ensure the button IDs are correct.");
+      return;
     }
 
-    updateButtons(); // Update button visibility based on user state
-  } catch (err) {
-    console.error("Error fetching session:", err.message);
+    if (currentUser) {
+      getStartedBtn.style.display = "none";
+      makeRequestBtn.style.display = "inline-block";
+    } else {
+      getStartedBtn.style.display = "inline-block";
+      makeRequestBtn.style.display = "none";
+    }
   }
-})();
+
+  // Fetch current session on page load
+  (async () => {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) throw new Error(error.message);
+
+      if (session) {
+        currentUser = session.user;
+        console.log("User is logged in:", currentUser);
+      } else {
+        currentUser = null;
+        console.log("User is not logged in.");
+      }
+
+      updateButtons();
+    } catch (err) {
+      console.error("Error fetching session:", err.message);
+    }
+  })();
+
   // get current user location and store it under current_locations table
   // Event listener for "Make Request" button
   const makeRequestBtn = document.getElementById("makeRequestBtn");
