@@ -6,25 +6,32 @@ if (!window.supabase) {
   let currentUser = null;
 
   // Utility function to insert or update user data in the 'clients' table
-  async function saveUserData(user, name) {
+  const saveUserData = async (user) => {
     try {
-      const { data, error } = await supabase
-        .from("clients")
-        .upsert([
-          {
-            id: user.id, // Supabase Auth user ID
-            name: name || user.user_metadata.name || null,
-            email: user.email,
-          },
-        ]);
-
-      if (error) throw new Error(error.message);
-      console.log("User data saved successfully:", data);
+      const { id, user_metadata, email } = user;
+  
+      const userData = {
+        id,
+        name: user_metadata?.name || "Anonymous",
+        email,
+      };
+  
+      console.log("Saving user data:", userData);
+  
+      const { data, error } = await supabase.from("clients").upsert([userData]);
+  
+      console.log("Upsert response:", { data, error });
+  
+      if (error) {
+        console.error("Upsert failed:", error.message);
+      } else {
+        console.log("Upsert successful:", data);
+      }
     } catch (err) {
-      console.error("Error saving user data:", err.message);
-      alert("Failed to save user data. Please try again.");
+      console.error("Error in saveUserData:", err.message);
     }
-  }
+  };
+  
 
   // Sign-up form handler
   const signupForm = document.getElementById("signupModal");
