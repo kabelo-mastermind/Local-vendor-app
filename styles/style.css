@@ -1,13 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-body{
-	line-height: 1.5;
-	font-family: 'Poppins', sans-serif;
+
+body {
+    line-height: 1.5;
+    font-family: 'Poppins', sans-serif;
 }
-*{
-	margin:0;
-	padding:0;
-	box-sizing: border-box;
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
+
 .welcome-message {
     text-align: center;
     padding: 20px;
@@ -25,7 +28,8 @@ body{
 }
 
 .blog-card {
-    width: calc(20% - 10px); /* Adjust for 5 cards in a row */
+    width: calc(20% - 10px);
+    /* Adjust for 5 cards in a row */
     border: 1px solid #ddd;
     border-radius: 8px;
     background-color: #fff;
@@ -68,7 +72,7 @@ body{
 
 /* Modal Styles */
 .modal {
-    display: flex;
+    display: none;/* Hidden by default */
     justify-content: center;
     align-items: center;
     position: fixed;
@@ -76,13 +80,15 @@ body{
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Semi-transparent background */
     z-index: 1000;
     justify-content: center;
     align-items: center;
 }
-#ForgotPassword{
-    display: flex;
+
+#ForgotPassword {
+    display: none;
     justify-content: center;
     align-items: center;
     position: fixed;
@@ -92,7 +98,7 @@ body{
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
     z-index: 1000;
-  }
+}
 
 .modal-content {
     background-color: #fff;
@@ -141,28 +147,32 @@ button.btn-primary {
 button.btn-primary:hover {
     background-color: #0056b3;
 }
-.messageDiv{
+
+.messageDiv {
     background-color: hsl(327, 90%, 28%);
     color: white;
     padding: 10px 20px;
-    margin: 10px ;
+    margin: 10px;
     border-radius: 4px;
     font-size: 1rem;
     opacity: 0;
     animation: fadeOut 7s forwards;
 }
 
-  
-  .messageDiv .success {
+
+.messageDiv .success {
     color: green;
-  }
-  
-  .messageDiv .error {
+}
+
+.messageDiv .error {
     color: red;
-  }
-  /* reset password */
-  .reset-password-container {
+}
+
+/* reset password */
+.reset-password-container {
     display: none;
+    justify-content: center;
+    align-items: center;
     position: fixed;
     top: 50%;
     left: 50%;
@@ -172,39 +182,50 @@ button.btn-primary:hover {
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-  }
-  
-  .reset-password-container .close-btn {
+}
+
+.reset-password-container .close-btn {
     position: absolute;
     top: 10px;
     right: 10px;
     cursor: pointer;
-  }
-  
+}
+
 /* Responsive Styles */
 @media (max-width: 768px) {
     .modal-content {
-        width: 100%; /* Full width on smaller screens */
-        max-width: 90%; /* Slight margin on smaller screens */
+        width: 100%;
+        /* Full width on smaller screens */
+        max-width: 90%;
+        /* Slight margin on smaller screens */
         padding: 15px;
     }
 
     input {
-        width: 100%; /* Inputs take full width */
+        width: 100%;
+        /* Inputs take full width */
     }
 }
 
 /* map styling */
-     /* Center the map and add spacing on the sides */
-     #map {
-        height: 600px; /* Height of the map */
-        width: 80%; /* Reduced width to add side spacing */
-        margin: 0 auto; /* Center the map horizontally */
-        margin-bottom: 100px; /* move the map up */
-        border: 2px solid #ddd; /* Optional: Add a border to make it visually distinct */
-        border-radius: 8px; /* Optional: Add rounded corners */
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better aesthetics */
-    }
+/* Center the map and add spacing on the sides */
+#map {
+    height: 600px;
+    /* Height of the map */
+    width: 80%;
+    /* Reduced width to add side spacing */
+    margin: 0 auto;
+    /* Center the map horizontally */
+    margin-bottom: 100px;
+    /* move the map up */
+    border: 2px solid #ddd;
+    /* Optional: Add a border to make it visually distinct */
+    border-radius: 8px;
+    /* Optional: Add rounded corners */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    /* Optional: Add a shadow for better aesthetics */
+}
+
 /* Responsive styles */
 @media (max-width: 768px) {
     .blog-card {
