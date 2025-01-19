@@ -40,11 +40,12 @@ if (!window.supabase) {
       console.log("User signed in:", currentUser);
 
       // Fetch and plot all locations after signing in
+      updateButtons(); // Update buttons after successful sign-in
       fetchAndPlotLocations();
     } else if (event === "SIGNED_OUT") {
       console.log("User signed out.");
       currentUser = null;
-
+      updateButtons(); // Update buttons after successful sign-in
       // Optionally, clear the locations from the map when logged out
       map.eachLayer((layer) => {
         if (layer instanceof L.Marker) {
@@ -139,24 +140,25 @@ signinForm.addEventListener("submit", async (e) => {
   });
 
 
-  // Update UI buttons based on authentication state
-  function updateButtons() {
-    const getStartedBtn = document.getElementById("getStartedBtn");
-    const makeRequestBtn = document.getElementById("makeRequestBtn");
+ // Update the UI buttons based on authentication state
+function updateButtons() {
+  const getStartedBtn = document.getElementById("getStartedBtn");
+  const makeRequestBtn = document.getElementById("makeRequestBtn");
 
-    if (!getStartedBtn || !makeRequestBtn) {
-      console.error("Buttons not found in the DOM. Ensure the button IDs are correct.");
-      return;
-    }
-
-    if (currentUser) {
-      getStartedBtn.style.display = "none";
-      makeRequestBtn.style.display = "inline-block";
-    } else {
-      getStartedBtn.style.display = "inline-block";
-      makeRequestBtn.style.display = "none";
-    }
+  if (!getStartedBtn || !makeRequestBtn) {
+    console.error("Buttons not found in the DOM. Ensure the button IDs are correct.");
+    return;
   }
+
+  // Update button visibility based on the authentication state
+  if (currentUser) {
+    getStartedBtn.style.display = "none"; // Hide the 'Get Started' button
+    makeRequestBtn.style.display = "inline-block"; // Show the 'Make Request' button
+  } else {
+    getStartedBtn.style.display = "inline-block"; // Show the 'Get Started' button
+    makeRequestBtn.style.display = "none"; // Hide the 'Make Request' button
+  }
+}
 
   // Fetch current session on page load
   (async () => {
