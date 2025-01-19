@@ -65,11 +65,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal Handling
     const signupModal = document.getElementById('signupModal');
     const signinModal = document.getElementById('signinModal');
-    const ForgotPasswordModal = document.getElementById('ForgotPassword');
+    // const ForgotPasswordModal = document.getElementById('ForgotPassword');
     const signupBtn = document.querySelector('.btn-primary');
     const openSignUp = document.getElementById('openSignUp');
     const openSignIn = document.getElementById('openSignIn');
-    const openForgotPassword = document.getElementById('openForgotPassword');
+    // const openForgotPassword = document.getElementById('openForgotPassword');
     const closeBtns = document.querySelectorAll('.close-btn');
 
     // Function to show a modal
@@ -144,16 +144,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // reset password
-    document.addEventListener('DOMContentLoaded', () => {
-        // Parse URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const isResetPassword = urlParams.get('reset');
+    // document.addEventListener('DOMContentLoaded', () => {
+    //     // Parse URL parameters
+    //     const urlParams = new URLSearchParams(window.location.search);
+    //     const isResetPassword = urlParams.get('reset');
       
-        // Show the Reset Password Modal if ?reset=true
-        if (isResetPassword) {
-          const resetModal = document.getElementById('resetPasswordForm');
-          resetModal.style.display = 'block';
-        }
-      });
+    //     // Show the Reset Password Modal if ?reset=true
+    //     if (isResetPassword) {
+    //       const resetModal = document.getElementById('resetPasswordForm');
+    //       resetModal.style.display = 'block';
+    //     }
+    //   });
       
 });

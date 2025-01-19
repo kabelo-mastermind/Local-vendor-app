@@ -131,91 +131,91 @@ if (!window.supabase) {
   }
 
 
-// Forgot Password Form Handler
-const forgotPasswordForm = document.getElementById("forgotPasswordForm");
-forgotPasswordForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = document.getElementById("ForgotPasswordEmail").value.trim();
-  const messageDiv = document.getElementById("ForgotPasswordMessage");
+// // Forgot Password Form Handler
+// const forgotPasswordForm = document.getElementById("forgotPasswordForm");
+// forgotPasswordForm.addEventListener("submit", async (e) => {
+//   e.preventDefault();
+//   const email = document.getElementById("ForgotPasswordEmail").value.trim();
+//   const messageDiv = document.getElementById("ForgotPasswordMessage");
 
-  if (!email) {
-    messageDiv.style.display = "block";
-    messageDiv.textContent = "Please enter your valid email address.";
-    messageDiv.style.color = "red";
-    return;
-  }
+//   if (!email) {
+//     messageDiv.style.display = "block";
+//     messageDiv.textContent = "Please enter your valid email address.";
+//     messageDiv.style.color = "red";
+//     return;
+//   }
 
-  try {
-    // Send password reset email
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "https://zambane.netlify.app/", // Update this URL
-    });
+//   try {
+//     // Send password reset email
+//     const { error } = await supabase.auth.resetPasswordForEmail(email, {
+//       redirectTo: "https://zambane.netlify.app/", // Update this URL
+//     });
     
 
-    if (error) {
-      throw new Error(error.message);
-    }
+//     if (error) {
+//       throw new Error(error.message);
+//     }
 
-    // Success message
-    messageDiv.style.display = "block";
-    messageDiv.textContent = "Password reset email sent! Please check your inbox.";
-    messageDiv.style.color = "green";
+//     // Success message
+//     messageDiv.style.display = "block";
+//     messageDiv.textContent = "Password reset email sent! Please check your inbox.";
+//     messageDiv.style.color = "green";
 
-    // Clear form
-    forgotPasswordForm.reset();
-  } catch (err) {
-    // Error message
-    messageDiv.style.display = "block";
-    messageDiv.textContent = `Error: ${err.message}`;
-    messageDiv.style.color = "red";
-  }
-});
+//     // Clear form
+//     forgotPasswordForm.reset();
+//   } catch (err) {
+//     // Error message
+//     messageDiv.style.display = "block";
+//     messageDiv.textContent = `Error: ${err.message}`;
+//     messageDiv.style.color = "red";
+//   }
+// });
 
-// Close modal on close button click for Forgot Password modal
-document.querySelector("#ForgotPassword .close-btn").addEventListener("click", () => {
-  document.getElementById("ForgotPassword").style.display = "none";
-});
+// // Close modal on close button click for Forgot Password modal
+// document.querySelector("#ForgotPassword .close-btn").addEventListener("click", () => {
+//   document.getElementById("ForgotPassword").style.display = "none";
+// });
 
-// Reset Password
-document.addEventListener("DOMContentLoaded", async () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const accessToken = urlParams.get("access_token");
+// // Reset Password
+// document.addEventListener("DOMContentLoaded", async () => {
+//   const urlParams = new URLSearchParams(window.location.search);
+//   const accessToken = urlParams.get("access_token");
 
-  if (accessToken) {
-    // Valid token found, show the reset password modal
-    const resetPasswordModal = document.querySelector(".reset-password-container");
-    resetPasswordModal.style.display = "block";
+//   if (accessToken) {
+//     // Valid token found, show the reset password modal
+//     const resetPasswordModal = document.querySelector(".reset-password-container");
+//     resetPasswordModal.style.display = "flex";
 
-    // Handle password reset logic here
-    const resetPasswordForm = document.getElementById("resetPasswordForm");
-    resetPasswordForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const newPassword = document.getElementById("newPassword").value;
-      const confirmPassword = document.getElementById("confirmPassword").value;
-      const resetMessage = document.getElementById("resetMessage");
+//     // Handle password reset logic here
+//     const resetPasswordForm = document.getElementById("resetPasswordForm");
+//     resetPasswordForm.addEventListener("submit", async (event) => {
+//       event.preventDefault();
+//       const newPassword = document.getElementById("newPassword").value;
+//       const confirmPassword = document.getElementById("confirmPassword").value;
+//       const resetMessage = document.getElementById("resetMessage");
 
-      if (newPassword !== confirmPassword) {
-        resetMessage.innerText = "Passwords do not match.";
-        resetMessage.style.color = "red";
-        return;
-      }
+//       if (newPassword !== confirmPassword) {
+//         resetMessage.innerText = "Passwords do not match.";
+//         resetMessage.style.color = "red";
+//         return;
+//       }
 
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
-      if (error) {
-        resetMessage.innerText = error.message;
-        resetMessage.style.color = "red";
-      } else {
-        resetMessage.innerText = "Password updated successfully!";
-        resetMessage.style.color = "green";
-        setTimeout(() => {
-          resetPasswordModal.style.display = "none";
-          window.location.href = "https://zambane.netlify.app/"; // Redirect to homepage after reset
-        }, 2000);
-      }
-    });
-  } else {
-    // No access token in URL, maybe handle error or redirect to login page
-    console.log("Access token is missing");
-  }
-});
+//       const { error } = await supabase.auth.updateUser({ password: newPassword });
+//       if (error) {
+//         resetMessage.innerText = error.message;
+//         resetMessage.style.color = "red";
+//       } else {
+//         resetMessage.innerText = "Password updated successfully!";
+//         resetMessage.style.color = "green";
+//         setTimeout(() => {
+//           resetPasswordModal.style.display = "none";
+//           window.location.href = "https://zambane.netlify.app/"; // Redirect to homepage after reset
+//         }, 2000);
+//       }
+//     });
+//   } else {
+//     // No access token in URL, maybe handle error or redirect to login page
+//     console.log("Access token is missing");
+//   }
+// });
 }
