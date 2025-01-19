@@ -52,18 +52,27 @@ if (!window.supabase) {
     }
   });
 
-  // Sign-out button handler
-  const signoutBtn = document.getElementById("sign-out");
-  signoutBtn.addEventListener("click", async () => {
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      alert(error.message);
-    } else {
-      alert("Signed out successfully!");
-      window.location.href = "https://zambane.netlify.app/";
-    }
-  });
+   // Sign-out button handler
+   const signoutBtn = document.getElementById('sign-out');
+   signoutBtn.addEventListener('click', async () => {
+     const { error } = await supabase.auth.signOut();
+ 
+     if (error) {
+       alert(error.message);
+     } else {
+       clearSessionData();
+       alert('Signed out successfully!');
+       window.location.href = 'https://zambane.netlify.app/';
+     }
+   });
+ 
+   // Clear session data
+   function clearSessionData() {
+     currentUser = null;
+     // Clear any other session-related data here
+     console.log('Session data cleared');
+   }
+ 
 
   // Authentication state change listener
   supabase.auth.onAuthStateChange((event, session) => {
@@ -200,7 +209,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         resetMessage.style.color = "green";
         setTimeout(() => {
           resetPasswordModal.style.display = "none";
-          window.location.href = "index.html"; // Redirect to homepage after reset
+          window.location.href = "https://zambane.netlify.app/"; // Redirect to homepage after reset
         }, 2000);
       }
     });
