@@ -32,12 +32,11 @@ if (!window.supabase) {
       if (user && user.id) {
         const { data, error: insertError } = await supabase
           .from("users")
-          .upsert([{
+          .insert([{
             id: user.id,  // user id from the Supabase Auth system
             name: name,
             email: email,
-            profile_picture: user.user_metadata.profile_picture || null, // Optional: if you want to store profile picture
-          }]);
+        }]);
         if (insertError) {
           console.error("Error inserting user data into the database:", insertError.message);
           alert("There was an error saving your user data. Please try again.");
