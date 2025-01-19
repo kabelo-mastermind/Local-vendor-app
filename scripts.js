@@ -1,8 +1,4 @@
-if (!window.supabase) {
-    console.error("Supabase client is not initialized. Please check your supabase.js configuration.");
-    alert("Supabase client initialization failed.");
-} else {
-    const supabase = window.supabase;
+
 
 
     // Wait for the DOM to load
@@ -78,4 +74,3 @@ if (!window.supabase) {
         }
 
     });
-}
