@@ -80,25 +80,37 @@ if (!window.supabase) {
     }
   });
 
-  // Sign-in form handler
-  const signinForm = document.getElementById("signinModal");
-  signinForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+// Sign-in form handler
+const signinForm = document.getElementById("signinModal");
+signinForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    const email = document.getElementById("signinEmail").value;
-    const password = document.getElementById("signinPassword").value;
+  const email = document.getElementById("signinEmail").value;
+  const password = document.getElementById("signinPassword").value;
 
-    try {
-      const { user, error } = await supabase.auth.signInWithPassword({ email, password });
+  try {
+    const { user, error } = await supabase.auth.signInWithPassword({ email, password });
 
-      if (error) throw new Error(error.message);
+    if (error) throw new Error(error.message);
 
-      alert("Sign-in successful!");
-    } catch (err) {
-      console.error("Sign-in error:", err.message);
-      alert(err.message);
-    }
-  });
+    // Close the modal after successful login
+    document.getElementById("signinModal").style.display = "none"; // Hide the modal
+
+    alert("Sign-in successful!");
+
+    // Update the UI to reflect login state
+    currentUser = user;
+    updateButtons();
+
+    // Now you can make requests after successful login
+    fetchAndPlotLocations(); // Optionally call any other methods for post-login actions
+
+  } catch (err) {
+    console.error("Sign-in error:", err.message);
+    alert(err.message);
+  }
+});
+
 
   // Sign-out handler
   const signoutBtn = document.getElementById("sign-out");
@@ -126,46 +138,43 @@ if (!window.supabase) {
     }
   });
 
+// Update UI buttons based on authentication state
+function updateButtons() {
+  const getStartedBtn = document.getElementById("getStartedBtn");
+  const makeRequestBtn = document.getElementById("makeRequestBtn");
 
-  // Update UI buttons based on authentication state
-  function updateButtons() {
-    const getStartedBtn = document.getElementById("getStartedBtn");
-    const makeRequestBtn = document.getElementById("makeRequestBtn");
-
-    if (!getStartedBtn || !makeRequestBtn) {
-      console.error("Buttons not found in the DOM. Ensure the button IDs are correct.");
-      return;
-    }
-
-    if (currentUser) {
-      getStartedBtn.style.display = "none";
-      makeRequestBtn.style.display = "inline-block";
-    } else {
-      getStartedBtn.style.display = "inline-block";
-      makeRequestBtn.style.display = "none";
-    }
+  if (!getStartedBtn || !makeRequestBtn) {
+    console.error("Buttons not found in the DOM. Ensure the button IDs are correct.");
+    return;
   }
 
-  // Fetch current session on page load
-  (async () => {
-    try {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) throw new Error(error.message);
+  if (currentUser) {
+    getStartedBtn.style.display = "none"; // Hide "Get Started" button
+    makeRequestBtn.style.display = "inline-block"; // Show "Make Request" button
+  } else {
+    getStartedBtn.style.display = "inline-block"; // Show "Get Started" button
+    makeRequestBtn.style.display = "none"; // Hide "Make Request" button
+  }
+}
+ // Call updateButtons on page load to ensure the correct buttons are shown based on the current user
+(async () => {
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) throw new Error(error.message);
 
-      if (session) {
-        currentUser = session.user;
-        console.log("User is logged in:", currentUser);
-      } else {
-        currentUser = null;
-        console.log("User is not logged in.");
-      }
-
-      updateButtons();
-    } catch (err) {
-      console.error("Error fetching session:", err.message);
+    if (session) {
+      currentUser = session.user;
+      console.log("User is logged in:", currentUser);
+    } else {
+      currentUser = null;
+      console.log("User is not logged in.");
     }
-  })();
 
+    updateButtons(); // Update button visibility based on user state
+  } catch (err) {
+    console.error("Error fetching session:", err.message);
+  }
+})();
   // get current user location and store it under current_locations table
   // Event listener for "Make Request" button
   const makeRequestBtn = document.getElementById("makeRequestBtn");
