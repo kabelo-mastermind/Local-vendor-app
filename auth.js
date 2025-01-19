@@ -120,4 +120,67 @@ if (!window.supabase) {
       // Add any additional logic here for handling the request
     });
   }
+
+  // change password
+  // Change Password/Email Form Handler
+const changePasswordForm = document.getElementById("changePasswordForm");
+changePasswordForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("ChangePasswordEmail").value.trim();
+  const password = document.getElementById("ChangePasswordPassword").value.trim();
+  const messageDiv = document.getElementById("ChangePasswordMessage");
+
+  // Check if the user is logged in
+  const { data: session, error: sessionError } = await supabase.auth.getSession();
+
+  if (!session) {
+    alert("You must be logged in to change email or password.");
+    return;
+  }
+
+  // Determine what to change
+  const isChangingEmail = email !== ""; // If email field is filled, update email
+  const isChangingPassword = password !== ""; // If password field is filled, update password
+
+  try {
+    if (isChangingEmail) {
+      const { error: emailError } = await supabase.auth.updateUser({
+        email: email,
+      });
+
+      if (emailError) {
+        throw new Error(emailError.message);
+      }
+
+      messageDiv.style.display = "block";
+      messageDiv.textContent = "Email updated successfully!";
+      messageDiv.style.color = "green";
+    }
+
+    if (isChangingPassword) {
+      const { error: passwordError } = await supabase.auth.updateUser({
+        password: password,
+      });
+
+      if (passwordError) {
+        throw new Error(passwordError.message);
+      }
+
+      messageDiv.style.display = "block";
+      messageDiv.textContent = "Password updated successfully!";
+      messageDiv.style.color = "green";
+    }
+
+    // Clear the form after successful update
+    changePasswordForm.reset();
+
+    // Optional: Close the modal
+    document.getElementById("ChangePassword").style.display = "none";
+  } catch (err) {
+    messageDiv.style.display = "block";
+    messageDiv.textContent = `Error: ${err.message}`;
+    messageDiv.style.color = "red";
+  }
+});
+
 }
