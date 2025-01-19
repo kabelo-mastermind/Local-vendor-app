@@ -139,7 +139,7 @@ forgotPasswordForm.addEventListener("submit", async (e) => {
   try {
     // Send password reset email
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "https://zambane.netlify.app/index.html", // Update this URL
+      redirectTo: "https://zambane.netlify.app/", // Update this URL
     });
 
     if (error) {
@@ -171,18 +171,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const accessToken = urlParams.get("access_token");
 
-  // Log the accessToken to verify it's being received correctly
-  console.log("Access Token:", accessToken);
-
   if (accessToken) {
-    // Show the reset password modal
+    // Valid token found, show the reset password modal
     const resetPasswordModal = document.querySelector(".reset-password-container");
-    resetPasswordModal.style.display = "block"; // Make sure the modal is displayed
+    resetPasswordModal.style.display = "block";
 
-    // Optionally, check if the modal has a specific class or style to show it
-    resetPasswordModal.classList.add("show-modal"); // Add a class to trigger a fade-in or show effect if needed
-
-    // Update the password when the user submits the form
+    // Handle password reset logic here
     const resetPasswordForm = document.getElementById("resetPasswordForm");
     resetPasswordForm.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -196,24 +190,22 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
-      try {
-        const { error } = await supabase.auth.updateUser({ password: newPassword });
-        if (error) {
-          resetMessage.innerText = error.message;
-          resetMessage.style.color = "red";
-        } else {
-          resetMessage.innerText = "Password updated successfully!";
-          resetMessage.style.color = "green";
-          setTimeout(() => {
-            resetPasswordModal.style.display = "none";
-            window.location.href = "index.html"; // Redirect after success
-          }, 2000);
-        }
-      } catch (err) {
-        resetMessage.innerText = `Error: ${err.message}`;
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) {
+        resetMessage.innerText = error.message;
         resetMessage.style.color = "red";
+      } else {
+        resetMessage.innerText = "Password updated successfully!";
+        resetMessage.style.color = "green";
+        setTimeout(() => {
+          resetPasswordModal.style.display = "none";
+          window.location.href = "index.html"; // Redirect to homepage after reset
+        }, 2000);
       }
     });
+  } else {
+    // No access token in URL, maybe handle error or redirect to login page
+    console.log("Access token is missing");
   }
 });
 
