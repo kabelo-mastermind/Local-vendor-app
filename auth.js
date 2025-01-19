@@ -38,13 +38,13 @@ if (!window.supabase) {
     if (event === "SIGNED_IN" && session?.user) {
       currentUser = session.user;
       console.log("User signed in:", currentUser);
-  
+
       // Fetch and plot all locations after signing in
       fetchAndPlotLocations();
     } else if (event === "SIGNED_OUT") {
       console.log("User signed out.");
       currentUser = null;
-  
+
       // Optionally, clear the locations from the map when logged out
       map.eachLayer((layer) => {
         if (layer instanceof L.Marker) {
@@ -53,7 +53,7 @@ if (!window.supabase) {
       });
     }
   });
-  
+
 
   // Sign-up form handler
   const signupForm = document.getElementById("signupModal");
@@ -104,18 +104,28 @@ if (!window.supabase) {
   const signoutBtn = document.getElementById("sign-out");
   signoutBtn.addEventListener("click", async () => {
     try {
+      // Sign out from Supabase
       const { error } = await supabase.auth.signOut();
       if (error) throw new Error(error.message);
 
+      // Clear all data from localStorage
+      localStorage.clear(); // Clears all items in localStorage
+
+      // Reset current user and log the sign-out
       currentUser = null;
       console.log("User signed out successfully.");
+
+      // Alert the user
       alert("Signed out successfully!");
-      window.location.href = "https://zambane.netlify.app/";
+
+      // Optionally, redirect to another page after sign-out
+      window.location.href = "https://zambane.netlify.app/"; // Redirect after sign-out (you can change the URL)
     } catch (err) {
       console.error("Sign-out error:", err.message);
       alert(err.message);
     }
   });
+
 
   // Update UI buttons based on authentication state
   function updateButtons() {
@@ -245,52 +255,52 @@ if (!window.supabase) {
 
 
   // Fetch and plot coordinates for all users
- // Fetch and plot coordinates for all users only if the user is logged in
-async function fetchAndPlotLocations() {
-  if (!currentUser) {
-    alert("You need to be logged in to view locations.");
-    return; // Exit the function if no user is logged in
-  }
-
-  try {
-    // Fetch all locations from the current_locations table
-    const { data: locations, error } = await supabase
-      .from("current_locations")
-      .select("latitude, longitude");
-
-    if (error) {
-      console.error("Error fetching locations:", error.message);
-      alert("Failed to load locations.");
-      return;
+  // Fetch and plot coordinates for all users only if the user is logged in
+  async function fetchAndPlotLocations() {
+    if (!currentUser) {
+      alert("You need to be logged in to view locations.");
+      return; // Exit the function if no user is logged in
     }
 
-    // Clear existing markers before plotting new ones
-    map.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
-        map.removeLayer(layer);
+    try {
+      // Fetch all locations from the current_locations table
+      const { data: locations, error } = await supabase
+        .from("current_locations")
+        .select("latitude, longitude");
+
+      if (error) {
+        console.error("Error fetching locations:", error.message);
+        alert("Failed to load locations.");
+        return;
       }
-    });
 
-    // Plot all locations on the map
-    locations.forEach((location) => {
-      const { latitude, longitude } = location;
+      // Clear existing markers before plotting new ones
+      map.eachLayer((layer) => {
+        if (layer instanceof L.Marker) {
+          map.removeLayer(layer);
+        }
+      });
 
-      L.marker([latitude, longitude], {
-        icon: L.icon({
-          iconUrl: "./assets/markers/customer.jpg",
-          iconSize: [30, 38],
-          iconAnchor: [15, 50],
-          popupAnchor: [0, -50],
-        }),
-      })
-        .addTo(map)
-        .bindPopup("<b>Location</b>");
-    });
-  } catch (err) {
-    console.error("Error fetching locations:", err.message);
-    alert("An error occurred while fetching locations.");
+      // Plot all locations on the map
+      locations.forEach((location) => {
+        const { latitude, longitude } = location;
+
+        L.marker([latitude, longitude], {
+          icon: L.icon({
+            iconUrl: "./assets/markers/customer.jpg",
+            iconSize: [30, 38],
+            iconAnchor: [15, 50],
+            popupAnchor: [0, -50],
+          }),
+        })
+          .addTo(map)
+          .bindPopup("<b>Location</b>");
+      });
+    } catch (err) {
+      console.error("Error fetching locations:", err.message);
+      alert("An error occurred while fetching locations.");
+    }
   }
-}
 
 
   // Initialize the map
