@@ -14,8 +14,8 @@
     <!-- Map -->
     <link rel="stylesheet" href="./assets/leaflet/leaflet.css" />
     <script src="./assets/leaflet/leaflet.js"></script>
-     <!-- Supabase CDN -->
-     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
 
 </head>
@@ -37,7 +37,7 @@
                         <li><a href="./index.html">Home</a></li>
                         <li><a href="#" id="openMap">Requests</a><span class="notification">1</span></li>
                         <!-- Changed link to trigger scroll -->
-                        <li><a href="#"id="sign-out" class="sign-out">Sign out</a></li>
+                        <li><a href="#" id="sign-out" class="sign-out">Sign out</a></li>
                     </ul>
                 </div>
                 <div class="menu-icon">
@@ -52,13 +52,13 @@
     <!-- Hero Banner -->
     <section class="hero">
         <div class="hero-container">
-          <h1>Welcome to Zambane</h1>
-          <p>Connecting local vendors with their community to meet daily needs effortlessly.</p>
-          <button id="getStartedBtn" class="btn-primary">Get Started</button>
-          <button id="makeRequestBtn" class="btn-primary" style="display: none;">Make Request</button>
+            <h1>Welcome to Zambane</h1>
+            <p>Connecting local vendors with their community to meet daily needs effortlessly.</p>
+            <button id="getStartedBtn" class="btn-primary">Get Started</button>
+            <button id="makeRequestBtn" class="btn-primary" style="display: none;">Make Request</button>
         </div>
-      </section>
-      
+    </section>
+
     <!-- Sign Up Modal -->
     <div id="signupModal" class="modal">
         <div class="modal-content">
@@ -96,6 +96,27 @@
 
                 <button type="submit" class="btn-primary">Sign In</button>
                 <h3>Don't have an account? <a href="#" id="openSignUp">Sign up now</a></h3>
+                <h5>Forgot Password?<a href="#" id="openChangePassword">Change Password</a></h5>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Change Password In Modal -->
+    <div id="ChangePassword" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>Change Password</h2>
+            <form id="changePasswordForm">
+                <div id="ChangePasswordMessage" class="messageDiv" style="display: none;"></div>
+                <label for="email">Email:</label>
+                <input type="email" id="ChangePasswordEmail" name="email" placeholder="Enter your email">
+
+                <label for="password">Password:</label>
+                <input type="password" id="ChangePasswordPassword" name="password" placeholder="Enter your password"
+                    required>
+
+                <button type="submit" class="btn-primary">Change Password</button>
             </form>
         </div>
     </div>
@@ -164,9 +185,9 @@
 
 
     <script src="./scripts.js"></script>
-    <script   type="module" src="./supabase.js"></script>
+    <script type="module" src="./supabase.js"></script>
     <script type="module" src="./auth.js"></script>
-    
+
 
 
 </body>

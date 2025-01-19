@@ -65,51 +65,71 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal Handling
     const signupModal = document.getElementById('signupModal');
     const signinModal = document.getElementById('signinModal');
+    const changePasswordModal = document.getElementById('ChangePassword');
     const signupBtn = document.querySelector('.btn-primary');
     const openSignUp = document.getElementById('openSignUp');
     const openSignIn = document.getElementById('openSignIn');
+    const openChangePassword = document.getElementById('openChangePassword');
     const closeBtns = document.querySelectorAll('.close-btn');
 
+    // Function to show a modal
+    function showModal(modal) {
+        if (modal) modal.style.display = 'block';
+    }
+
+    // Function to hide a modal
+    function hideModal(modal) {
+        if (modal) modal.style.display = 'none';
+    }
+
+    // Open Sign Up modal
     if (signupBtn && signupModal) {
         signupBtn.addEventListener('click', () => {
-            signupModal.style.display = 'block';
+            showModal(signupModal);
         });
     }
 
-    if (document.querySelector('.sign-out') && signinModal) {
-        document.querySelector('.sign-out').addEventListener('click', (e) => {
-            e.preventDefault();
-            signupModal.style.display = 'none';
-            signinModal.style.display = 'block';
-        });
-    }
-
+    // Open Sign In modal
     if (openSignIn) {
         openSignIn.addEventListener('click', (e) => {
             e.preventDefault();
-            signupModal.style.display = 'none';
-            signinModal.style.display = 'block';
+            hideModal(signupModal);
+            showModal(signinModal);
         });
     }
 
+    // Open Sign Up modal from Sign In
     if (openSignUp) {
         openSignUp.addEventListener('click', (e) => {
             e.preventDefault();
-            signinModal.style.display = 'none';
-            signupModal.style.display = 'block';
+            hideModal(signinModal);
+            showModal(signupModal);
         });
     }
 
+    // Open Change Password modal
+    if (openChangePassword) {
+        openChangePassword.addEventListener('click', (e) => {
+            e.preventDefault();
+            hideModal(signinModal); // Hide the Sign In modal if open
+            showModal(changePasswordModal); // Show the Change Password modal
+        });
+    }
+
+    // Close all modals when close button is clicked
     closeBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            if (signupModal) signupModal.style.display = 'none';
-            if (signinModal) signinModal.style.display = 'none';
+            hideModal(signupModal);
+            hideModal(signinModal);
+            hideModal(changePasswordModal);
         });
     });
 
+    // Close modals when clicking outside the modal content
     window.addEventListener('click', (e) => {
-        if (e.target === signupModal) signupModal.style.display = 'none';
-        if (e.target === signinModal) signinModal.style.display = 'none';
+        if (e.target === signupModal) hideModal(signupModal);
+        if (e.target === signinModal) hideModal(signinModal);
+        if (e.target === changePasswordModal) hideModal(changePasswordModal);
     });
 
     // Smooth scrolling to the map section
