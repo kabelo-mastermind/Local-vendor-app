@@ -123,63 +123,82 @@ if (!window.supabase) {
 
   // change password
   // Change Password/Email Form Handler
-const changePasswordForm = document.getElementById("changePasswordForm");
-changePasswordForm.addEventListener("submit", async (e) => {
+// Forgot Password Form Handler
+const forgotPasswordForm = document.getElementById("forgotPasswordForm");
+forgotPasswordForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const email = document.getElementById("ChangePasswordEmail").value.trim();
-  const password = document.getElementById("ChangePasswordPassword").value.trim();
-  const messageDiv = document.getElementById("ChangePasswordMessage");
+  const email = document.getElementById("ForgotPasswordEmail").value.trim();
+  const messageDiv = document.getElementById("ForgotPasswordMessage");
 
-  // Check if the user is logged in
-  const { data: session, error: sessionError } = await supabase.auth.getSession();
-
-  if (!session) {
-    alert("You must be logged in to change email or password.");
+  if (!email) {
+    messageDiv.style.display = "block";
+    messageDiv.textContent = "Please enter your email address.";
+    messageDiv.style.color = "red";
     return;
   }
 
-  // Determine what to change
-  const isChangingEmail = email !== ""; // If email field is filled, update email
-  const isChangingPassword = password !== ""; // If password field is filled, update password
-
   try {
-    if (isChangingEmail) {
-      const { error: emailError } = await supabase.auth.updateUser({
-        email: email,
-      });
+    // Send password reset email
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: "https://zambane.netlify.app/", // Update this URL
+    });
 
-      if (emailError) {
-        throw new Error(emailError.message);
-      }
-
-      messageDiv.style.display = "block";
-      messageDiv.textContent = "Email updated successfully!";
-      messageDiv.style.color = "green";
+    if (error) {
+      throw new Error(error.message);
     }
 
-    if (isChangingPassword) {
-      const { error: passwordError } = await supabase.auth.updateUser({
-        password: password,
-      });
+    // Success message
+    messageDiv.style.display = "block";
+    messageDiv.textContent = "Password reset email sent! Please check your inbox.";
+    messageDiv.style.color = "green";
 
-      if (passwordError) {
-        throw new Error(passwordError.message);
-      }
-
-      messageDiv.style.display = "block";
-      messageDiv.textContent = "Password updated successfully!";
-      messageDiv.style.color = "green";
-    }
-
-    // Clear the form after successful update
-    changePasswordForm.reset();
-
-    // Optional: Close the modal
-    document.getElementById("ChangePassword").style.display = "none";
+    // Clear form
+    forgotPasswordForm.reset();
   } catch (err) {
+    // Error message
     messageDiv.style.display = "block";
     messageDiv.textContent = `Error: ${err.message}`;
     messageDiv.style.color = "red";
+  }
+});
+
+// Close modal on close button click
+document.querySelector(".close-btn").addEventListener("click", () => {
+  document.getElementById("ForgotPassword").style.display = "none";
+});
+// reset password
+document.addEventListener("DOMContentLoaded", async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const accessToken = urlParams.get("access_token");
+
+  if (accessToken) {
+    // Show the reset password modal
+    const resetPasswordModal = document.querySelector(".reset-password-container");
+    resetPasswordModal.style.display = "block";
+
+    // Update the password when the user submits the form
+    const resetPasswordForm = document.getElementById("resetPasswordForm");
+    resetPasswordForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const newPassword = document.getElementById("newPassword").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      if (newPassword !== confirmPassword) {
+        document.getElementById("resetMessage").innerText = "Passwords do not match.";
+        return;
+      }
+
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) {
+        document.getElementById("resetMessage").innerText = error.message;
+      } else {
+        document.getElementById("resetMessage").innerText = "Password updated successfully!";
+        setTimeout(() => {
+          resetPasswordModal.style.display = "none";
+          window.location.href = "index.html";
+        }, 2000);
+      }
+    });
   }
 });
 

@@ -65,11 +65,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal Handling
     const signupModal = document.getElementById('signupModal');
     const signinModal = document.getElementById('signinModal');
-    const changePasswordModal = document.getElementById('ChangePassword');
+    const ForgotPasswordModal = document.getElementById('ForgotPassword');
     const signupBtn = document.querySelector('.btn-primary');
     const openSignUp = document.getElementById('openSignUp');
     const openSignIn = document.getElementById('openSignIn');
-    const openChangePassword = document.getElementById('openChangePassword');
+    const openForgotPassword = document.getElementById('openForgotPassword');
     const closeBtns = document.querySelectorAll('.close-btn');
 
     // Function to show a modal
@@ -108,11 +108,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Open Change Password modal
-    if (openChangePassword) {
-        openChangePassword.addEventListener('click', (e) => {
+    if (openForgotPassword) {
+        openForgotPassword.addEventListener('click', (e) => {
             e.preventDefault();
             hideModal(signinModal); // Hide the Sign In modal if open
-            showModal(changePasswordModal); // Show the Change Password modal
+            showModal(ForgotPasswordModal); // Show the Change Password modal
         });
     }
 
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', () => {
             hideModal(signupModal);
             hideModal(signinModal);
-            hideModal(changePasswordModal);
+            hideModal(ForgotPasswordModal);
         });
     });
 
@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('click', (e) => {
         if (e.target === signupModal) hideModal(signupModal);
         if (e.target === signinModal) hideModal(signinModal);
-        if (e.target === changePasswordModal) hideModal(changePasswordModal);
+        if (e.target === ForgotPasswordModal) hideModal(ForgotPasswordModal);
     });
 
     // Smooth scrolling to the map section
@@ -142,4 +142,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
+
+    // reset password
+    document.addEventListener('DOMContentLoaded', () => {
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const isResetPassword = urlParams.get('reset');
+      
+        // Show the Reset Password Modal if ?reset=true
+        if (isResetPassword) {
+          const resetModal = document.getElementById('ForgotPassword');
+          resetModal.style.display = 'block';
+        }
+      });
+      
 });
