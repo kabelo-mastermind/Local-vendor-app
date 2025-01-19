@@ -157,6 +157,7 @@ if (!window.supabase) {
 
   // get current user location and store it under current_locations table
   // Event listener for "Make Request" button
+// Event listener for "Make Request" button
 const makeRequestBtn = document.getElementById("makeRequestBtn");
 makeRequestBtn.addEventListener("click", async () => {
   if (!currentUser) {
@@ -188,6 +189,9 @@ makeRequestBtn.addEventListener("click", async () => {
           } else {
             console.log("Location saved:", data);
             alert("Your location has been saved successfully.");
+
+            // After saving the location, fetch the coordinates and plot them
+            fetchAndPlotLocations();
           }
         } catch (err) {
           console.error("Error in saving location:", err.message);
@@ -204,45 +208,54 @@ makeRequestBtn.addEventListener("click", async () => {
   }
 });
 
-  // Map initialization
-  const map = L.map("map").setView([-25.5416, 28.0992], 13); // Centered in Soshanguve
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
-  }).addTo(map);
+// Fetch and plot coordinates on the map
+async function fetchAndPlotLocations() {
+  try {
+    const { data: locations, error } = await supabase
+      .from("current_locations")
+      .select("latitude, longitude")
+      .eq("user_id", currentUser.id);  // Fetching locations for the logged-in user
 
-  // Fetch customer markers
-  async function fetchMarkers() {
-    try {
-      const { data: customers, error } = await supabase
-        .from("current_locations")
-        .select("latitude, longitude");
-
-      if (error) throw new Error(error.message);
-
-      if (!customers || customers.length === 0) {
-        console.log("No customer locations found.");
-        return;
-      }
-
-      customers.forEach((customer) => {
-        L.marker([customer.latitude, customer.longitude], {
-          icon: L.icon({
-            iconUrl: "./assets/markers/customer.jpg",
-            iconSize: [30, 38],
-            iconAnchor: [15, 50],
-            popupAnchor: [0, -50],
-          }),
-        })
-          .addTo(map)
-          .bindPopup("<b>Customer</b>");
-      });
-    } catch (err) {
-      console.error("Error fetching markers:", err.message);
-      alert("Failed to load map markers. Please try again later.");
+    if (error) {
+      console.error("Error fetching locations:", error.message);
+      alert("Failed to load your locations.");
+      return;
     }
-  }
 
-  // Load markers on map
-  fetchMarkers();
+    // Clear existing markers before plotting new ones
+    map.eachLayer((layer) => {
+      if (layer instanceof L.Marker) {
+        map.removeLayer(layer);
+      }
+    });
+
+    // Plot the user's location(s) on the map
+    locations.forEach((location) => {
+      const { latitude, longitude } = location;
+
+      L.marker([latitude, longitude], {
+        icon: L.icon({
+          iconUrl: "./assets/markers/customer.jpg",
+          iconSize: [30, 38],
+          iconAnchor: [15, 50],
+          popupAnchor: [0, -50],
+        }),
+      })
+        .addTo(map)
+        .bindPopup("<b>Customer Location</b>");
+    });
+  } catch (err) {
+    console.error("Error fetching locations:", err.message);
+    alert("An error occurred while fetching your locations.");
+  }
 }
+
+// Initialize the map
+const map = L.map("map").setView([-25.5416, 28.0992], 13); // Centered in Soshanguve
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 19,
+  attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+}).addTo(map);
+
+// Fetch and plot locations on map at the beginning
+fetchAndPlotLocations();
