@@ -4,26 +4,6 @@ if (!window.supabase) {
 } else {
   const supabase = window.supabase;
   let currentUser = null;
-  let userLocation = null;
-
-  // Function to fetch current location
-  const fetchUserLocation = () => {
-    return new Promise((resolve, reject) => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            resolve({ latitude, longitude });
-          },
-          (error) => {
-            reject(`Error fetching location: ${error.message}`);
-          }
-        );
-      } else {
-        reject("Geolocation is not supported by this browser.");
-      }
-    });
-  };
 
   // Sign-up form handler
   const signupForm = document.getElementById("signupModal");
@@ -45,62 +25,71 @@ if (!window.supabase) {
       alert(error.message);
     } else {
       alert("Sign-up successful! Please check your email to confirm your account.");
+
+      // Save user data in the 'users' table after sign-up
+      const { data, error: insertError } = await supabase
+        .from("users")
+        .insert([
+          {
+            id: user.id,
+            name: name,
+            email: email,
+            password: password, // Consider hashing the password before storing it in production
+          },
+        ]);
+
+      if (insertError) {
+        console.error("Error inserting user data into the database:", insertError.message);
+        alert("There was an error saving your user data. Please try again.");
+      } else {
+        console.log("User data saved successfully:", data);
+      }
     }
   });
 
   // Sign-in form handler
-  signupForm.addEventListener("submit", async (e) => {
+  const signinForm = document.getElementById("signinModal");
+  signinForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    const email = document.getElementById("signinEmail").value;
+    const password = document.getElementById("signinPassword").value;
 
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-
-    // Create a new user in Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    const { user, session, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     });
 
-    if (authError) {
-      alert(authError.message);
-      return;
-    }
-
-    // Insert user data into the 'users' table
-    const { error: dbError } = await supabase.from("users").insert([
-      {
-        id: authData.user.id, // Use the user's unique ID from Supabase Auth
-        name: name,
-        email: email,
-      },
-    ]);
-
-    if (dbError) {
-      alert(`Database error: ${dbError.message}`);
+    if (error) {
+      alert(error.message);
     } else {
-      alert("Sign-up successful! Please check your email to confirm your account.");
+      alert("Sign-in successful!");
+      // Close all modals
+      const modals = document.querySelectorAll(".modal");
+      modals.forEach((modal) => {
+        modal.style.display = "none";
+      });
     }
   });
 
   // Sign-out button handler
-  const signoutBtn = document.getElementById("sign-out");
-  signoutBtn.addEventListener("click", async () => {
+  const signoutBtn = document.getElementById('sign-out');
+  signoutBtn.addEventListener('click', async () => {
     const { error } = await supabase.auth.signOut();
 
     if (error) {
       alert(error.message);
     } else {
       clearSessionData();
-      alert("Signed out successfully!");
-      window.location.href = "https://zambane.netlify.app/";
+      alert('Signed out successfully!');
+      window.location.href = 'https://zambane.netlify.app/';
     }
   });
 
   // Clear session data
   function clearSessionData() {
     currentUser = null;
-    console.log("Session data cleared");
+    // Clear any other session-related data here
+    console.log('Session data cleared');
   }
 
   // Authentication state change listener
@@ -122,14 +111,6 @@ if (!window.supabase) {
     if (currentUser) {
       getStartedBtn.style.display = "none";
       makeRequestBtn.style.display = "inline-block";
-
-      // Fetch user's current location on login
-      fetchUserLocation()
-        .then((location) => {
-          userLocation = location;
-          console.log("User location fetched:", userLocation);
-        })
-        .catch((err) => console.error(err));
     } else {
       getStartedBtn.style.display = "inline-block";
       makeRequestBtn.style.display = "none";
@@ -142,14 +123,6 @@ if (!window.supabase) {
     if (session) {
       currentUser = session.user;
       console.log("User is logged in:", currentUser);
-
-      // Fetch user's current location
-      fetchUserLocation()
-        .then((location) => {
-          userLocation = location;
-          console.log("User location fetched:", userLocation);
-        })
-        .catch((err) => console.error(err));
     } else {
       currentUser = null;
       console.log("User is not logged in.");
@@ -157,35 +130,46 @@ if (!window.supabase) {
     updateButtons();
   })();
 
-  // Handle Make Request button click
+  // Get current location and store in Supabase
   if (makeRequestBtn) {
     makeRequestBtn.addEventListener("click", async () => {
-      if (!userLocation) {
-        alert("Unable to fetch your location. Please enable location services and try again.");
-        return;
-      }
+      // Check if geolocation is available
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
 
-      try {
-        const { latitude, longitude } = userLocation;
-        const { error } = await supabase.from("locations").insert([
-          {
-            user_id: currentUser.id,
-            latitude: latitude,
-            longitude: longitude,
+            // Save location to Supabase
+            const { data, error } = await supabase
+              .from("current_locations")
+              .insert([
+                {
+                  user_id: currentUser.id,  // Assuming currentUser is set after login
+                  latitude: latitude,
+                  longitude: longitude,
+                },
+              ]);
+
+            if (error) {
+              console.error("Error saving location data:", error.message);
+              alert("There was an error saving your location. Please try again.");
+            } else {
+              console.log("Location data saved successfully:", data);
+              alert("Your location has been saved successfully.");
+            }
           },
-        ]);
-
-        if (error) {
-          console.error("Error saving location:", error.message);
-          alert("Failed to save location. Please try again.");
-        } else {
-          console.log("Location saved successfully!");
-          alert("Request made successfully!");
-        }
-      } catch (err) {
-        console.error("Error:", err);
-        alert("An unexpected error occurred.");
+          (error) => {
+            console.error("Error getting location:", error.message);
+            alert("Unable to retrieve your location. Please try again.");
+          }
+        );
+      } else {
+        alert("Geolocation is not available in your browser.");
       }
     });
   }
+
+  // Forgot Password Form Handler (optional)
+  // Similar logic can be added if you want to implement this functionality
+  // ...
 }

@@ -3,8 +3,7 @@ if (!window.supabase) {
     alert("Supabase client initialization failed.");
 } else {
     const supabase = window.supabase;
-    let currentUser = null;
-    let userLocation = null;
+
 
     // Wait for the DOM to load
     document.addEventListener('DOMContentLoaded', () => {
@@ -19,11 +18,11 @@ if (!window.supabase) {
         async function fetchMarkers() {
             // Fetch customer data
             const { data: customers, error: customerError } = await supabase
-                .from('customers') // Replace with your actual table name
+                .from('current_locations') // Replace with your actual table name
                 .select('latitude, longitude'); // Assuming these are the columns for coordinates
 
             if (customerError) {
-                console.error("Error fetching customers:", customerError);
+                console.error("Error fetching current locations:", customerError);
                 alert("Failed to fetch customer data. Please try again later.");
                 return;
             }
