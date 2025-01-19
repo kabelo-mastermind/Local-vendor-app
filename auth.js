@@ -121,6 +121,11 @@ if (!window.supabase) {
     const getStartedBtn = document.getElementById("getStartedBtn");
     const makeRequestBtn = document.getElementById("makeRequestBtn");
 
+    if (!getStartedBtn || !makeRequestBtn) {
+      console.error("Buttons not found in the DOM. Ensure the button IDs are correct.");
+      return;
+    }
+
     if (currentUser) {
       getStartedBtn.style.display = "none";
       makeRequestBtn.style.display = "inline-block";
@@ -150,7 +155,6 @@ if (!window.supabase) {
     }
   })();
 
-
   // Map initialization
   const map = L.map("map").setView([-25.5416, 28.0992], 13); // Centered in Soshanguve
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -166,6 +170,11 @@ if (!window.supabase) {
         .select("latitude, longitude");
 
       if (error) throw new Error(error.message);
+
+      if (!customers || customers.length === 0) {
+        console.log("No customer locations found.");
+        return;
+      }
 
       customers.forEach((customer) => {
         L.marker([customer.latitude, customer.longitude], {
