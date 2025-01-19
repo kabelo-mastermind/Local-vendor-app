@@ -121,8 +121,7 @@ if (!window.supabase) {
     });
   }
 
-  // change password
-  // Change Password/Email Form Handler
+
 // Forgot Password Form Handler
 const forgotPasswordForm = document.getElementById("forgotPasswordForm");
 forgotPasswordForm.addEventListener("submit", async (e) => {
@@ -162,11 +161,12 @@ forgotPasswordForm.addEventListener("submit", async (e) => {
   }
 });
 
-// Close modal on close button click
-document.querySelector(".close-btn").addEventListener("click", () => {
+// Close modal on close button click for Forgot Password modal
+document.querySelector("#ForgotPassword .close-btn").addEventListener("click", () => {
   document.getElementById("ForgotPassword").style.display = "none";
 });
-// reset password
+
+// Reset Password
 document.addEventListener("DOMContentLoaded", async () => {
   const urlParams = new URLSearchParams(window.location.search);
   const accessToken = urlParams.get("access_token");
@@ -182,17 +182,21 @@ document.addEventListener("DOMContentLoaded", async () => {
       event.preventDefault();
       const newPassword = document.getElementById("newPassword").value;
       const confirmPassword = document.getElementById("confirmPassword").value;
+      const resetMessage = document.getElementById("resetMessage");
 
       if (newPassword !== confirmPassword) {
-        document.getElementById("resetMessage").innerText = "Passwords do not match.";
+        resetMessage.innerText = "Passwords do not match.";
+        resetMessage.style.color = "red";
         return;
       }
 
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) {
-        document.getElementById("resetMessage").innerText = error.message;
+        resetMessage.innerText = error.message;
+        resetMessage.style.color = "red";
       } else {
-        document.getElementById("resetMessage").innerText = "Password updated successfully!";
+        resetMessage.innerText = "Password updated successfully!";
+        resetMessage.style.color = "green";
         setTimeout(() => {
           resetPasswordModal.style.display = "none";
           window.location.href = "index.html";
@@ -201,5 +205,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 });
+
 
 }
