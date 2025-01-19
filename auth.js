@@ -242,58 +242,6 @@ makeRequestBtn.addEventListener("click", async () => {
   }
 });
 
-// Fetch and plot coordinates on the map
-async function fetchAndPlotLocations() {
-  try {
-    const { data: locations, error } = await supabase
-      .from("current_locations")
-      .select("latitude, longitude")
-      .eq("user_id", currentUser.id);  // Fetching locations for the logged-in user
-
-    if (error) {
-      console.error("Error fetching locations:", error.message);
-      alert("Failed to load your locations.");
-      return;
-    }
-
-    // Clear existing markers before plotting new ones
-    map.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
-        map.removeLayer(layer);
-      }
-    });
-
-    // Plot the user's location(s) on the map
-    locations.forEach((location) => {
-      const { latitude, longitude } = location;
-
-      L.marker([latitude, longitude], {
-        icon: L.icon({
-          iconUrl: "./assets/markers/customer.jpg",
-          iconSize: [30, 38],
-          iconAnchor: [15, 50],
-          popupAnchor: [0, -50],
-        }),
-      })
-        .addTo(map)
-        .bindPopup("<b>Customer Location</b>");
-    });
-  } catch (err) {
-    console.error("Error fetching locations:", err.message);
-    alert("An error occurred while fetching your locations.");
-  }
-}
-
-// Initialize the map
-const map = L.map("map").setView([-25.5416, 28.0992], 13); // Centered in Soshanguve
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  maxZoom: 19,
-  attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
-}).addTo(map);
-
-// Fetch and plot locations on map at the beginning
-fetchAndPlotLocations();
-
 // Fetch and plot locations for non-signed-up users
 async function fetchAndPlotAnonymousLocations() {
   try {
@@ -322,7 +270,7 @@ async function fetchAndPlotAnonymousLocations() {
 
       L.marker([latitude, longitude], {
         icon: L.icon({
-          iconUrl: "./assets/markers/customer.jpg", // Different marker for anonymous users
+          iconUrl: "./assets/markers/anonymous.jpg", // Different marker for anonymous users
           iconSize: [30, 38],
           iconAnchor: [15, 50],
           popupAnchor: [0, -50],
@@ -416,5 +364,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 
 // Fetch and plot locations for both signed-up and non-signed-up users on map
 fetchAndPlotAllLocations();
+
+
 
 }
