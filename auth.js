@@ -157,7 +157,6 @@ if (!window.supabase) {
 
   // get current user location and store it under current_locations table
   // Event listener for "Make Request" button
-// Event listener for "Make Request" button
 const makeRequestBtn = document.getElementById("makeRequestBtn");
 makeRequestBtn.addEventListener("click", async () => {
   if (!currentUser) {
@@ -174,28 +173,63 @@ makeRequestBtn.addEventListener("click", async () => {
         console.log("Current Location:", latitude, longitude);
 
         try {
-          // Save the location data to the 'current_locations' table
-          const { data, error } = await supabase.from("current_locations").upsert([
-            {
-              user_id: currentUser.id,  // The logged-in user's ID
-              latitude,
-              longitude,
-            },
-          ]);
+          // Check if the user already has a location in the 'current_locations' table
+          const { data: existingLocation, error: fetchError } = await supabase
+            .from("current_locations")
+            .select("id")
+            .eq("user_id", currentUser.id)
+            .single();  // We expect a single record for each user
 
-          if (error) {
-            console.error("Error saving location:", error.message);
-            alert("Failed to save your location. Please try again.");
+          if (fetchError) {
+            console.error("Error fetching location:", fetchError.message);
+            alert("Failed to check for existing location. Please try again.");
+            return;
+          }
+
+          let response;
+
+          // If a location already exists for the user, update it
+          if (existingLocation) {
+            const { data, error } = await supabase
+              .from("current_locations")
+              .update({ latitude, longitude })
+              .eq("user_id", currentUser.id);
+
+            if (error) {
+              console.error("Error updating location:", error.message);
+              alert("Failed to update your location. Please try again.");
+            } else {
+              response = data;
+              console.log("Location updated:", data);
+              alert("Your location has been updated successfully.");
+            }
           } else {
-            console.log("Location saved:", data);
-            alert("Your location has been saved successfully.");
+            // If no location exists, insert a new record
+            const { data, error } = await supabase.from("current_locations").upsert([
+              {
+                user_id: currentUser.id,  // The logged-in user's ID
+                latitude,
+                longitude,
+              },
+            ]);
 
-            // After saving the location, fetch the coordinates and plot them
+            if (error) {
+              console.error("Error saving location:", error.message);
+              alert("Failed to save your location. Please try again.");
+            } else {
+              response = data;
+              console.log("Location saved:", data);
+              alert("Your location has been saved successfully.");
+            }
+          }
+
+          // After saving or updating the location, fetch and plot all locations for the user
+          if (response) {
             fetchAndPlotLocations();
           }
         } catch (err) {
-          console.error("Error in saving location:", err.message);
-          alert("An error occurred while saving your location.");
+          console.error("Error in saving/updating location:", err.message);
+          alert("An error occurred while saving/updating your location.");
         }
       },
       (error) => {
@@ -259,4 +293,5 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 
 // Fetch and plot locations on map at the beginning
 fetchAndPlotLocations();
+
 }
