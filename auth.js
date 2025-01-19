@@ -156,7 +156,7 @@ if (!window.supabase) {
   })();
 
   // get current user location and store it under current_locations table
-  // Event listener for "Make Request" button
+// Event listener for "Make Request" button
 const makeRequestBtn = document.getElementById("makeRequestBtn");
 makeRequestBtn.addEventListener("click", async () => {
   if (!currentUser) {
@@ -293,5 +293,6 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 
 // Fetch and plot locations on map at the beginning
 fetchAndPlotLocations();
+
 
 }
