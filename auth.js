@@ -29,26 +29,26 @@ if (!window.supabase) {
       alert("Sign-up successful! Please check your email to confirm your account.");
   
       // After signup, insert the user data into the 'users' table
-      const { data, error: insertError } = await supabase
-        .from("users")
-        .upsert([ // Using upsert to insert or update the user
-          {
+      if (user && user.id) {
+        const { data, error: insertError } = await supabase
+          .from("users")
+          .upsert([{
             id: user.id,  // user id from the Supabase Auth system
             name: name,
             email: email,
             profile_picture: user.user_metadata.profile_picture || null, // Optional: if you want to store profile picture
-          }
-        ]);
-  
-      if (insertError) {
-        console.error("Error inserting user data into the database:", insertError.message);
-        alert("There was an error saving your user data. Please try again.");
+          }]);
+        if (insertError) {
+          console.error("Error inserting user data into the database:", insertError.message);
+          alert("There was an error saving your user data. Please try again.");
+        } else {
+          console.log("User data saved successfully:", data);
+        }
       } else {
-        console.log("User data saved successfully:", data);
+        console.error("User ID is not available.");
       }
     }
   });
-  
 
   // Sign-in form handler
   const signinForm = document.getElementById("signinModal");
@@ -88,7 +88,6 @@ if (!window.supabase) {
       }
     }
   });
-  
 
   // Sign-out button handler
   const signoutBtn = document.getElementById('sign-out');
@@ -149,7 +148,6 @@ if (!window.supabase) {
     updateButtons();
   })();
 
-
   // Get current location and store in Supabase
   if (makeRequestBtn) {
     makeRequestBtn.addEventListener("click", async () => {
@@ -162,13 +160,11 @@ if (!window.supabase) {
             // Save location to Supabase
             const { data, error } = await supabase
               .from("current_locations")
-              .insert([
-                {
-                  user_id: currentUser.id,  // Assuming currentUser is set after login
-                  latitude: latitude,
-                  longitude: longitude,
-                },
-              ]);
+              .insert([{
+                user_id: currentUser.id,  // Assuming currentUser is set after login
+                latitude: latitude,
+                longitude: longitude,
+              }]);
 
             if (error) {
               console.error("Error saving location data:", error.message);
@@ -226,7 +222,4 @@ if (!window.supabase) {
 
   // Call the function to fetch markers from Supabase
   fetchMarkers();
-  // Forgot Password Form Handler (optional)
-  // Similar logic can be added if you want to implement this functionality
-  // ...
 }
