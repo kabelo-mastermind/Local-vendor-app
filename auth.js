@@ -28,10 +28,10 @@ if (!window.supabase) {
     } else {
       alert("Sign-up successful! Please check your email to confirm your account.");
   
-      // After signup, insert the user data into the 'users' table
+      // After signup, insert the user data into the 'clients' table
       if (user && user.id) {
         const { data, error: insertError } = await supabase
-          .from("users")
+          .from("clients")
           .insert([{
             id: user.id,  // user id from the Supabase Auth system
             name: name,
@@ -69,7 +69,7 @@ if (!window.supabase) {
   
       // After login, check if the user exists in the 'users' table
       const { data, error: insertError } = await supabase
-        .from("users")
+        .from("clients")
         .upsert([ // Using upsert to insert or update the user
           {
             id: user.id,  // user id from the Supabase Auth system
