@@ -130,6 +130,7 @@ if (!window.supabase) {
     updateButtons();
   })();
 
+
   // Get current location and store in Supabase
   if (makeRequestBtn) {
     makeRequestBtn.addEventListener("click", async () => {
@@ -169,6 +170,43 @@ if (!window.supabase) {
     });
   }
 
+  // Initialize the map
+  var map = L.map('map').setView([-25.5416, 28.0992], 13); // Centered in Soshanguve
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  // Fetch customer coordinates from Supabase
+  async function fetchMarkers() {
+      // Fetch customer data
+      const { data: customers, error: customerError } = await supabase
+          .from('current_locations') // Replace with your actual table name
+          .select('latitude, longitude'); // Assuming these are the columns for coordinates
+
+      if (customerError) {
+          console.error("Error fetching current locations:", customerError);
+          alert("Failed to fetch customer data. Please try again later.");
+          return;
+      }
+
+      // Add customer markers
+      customers.forEach(customer => {
+          L.marker([customer.latitude, customer.longitude], { 
+              icon: L.icon({
+                  iconUrl: './assets/markers/customer.jpg',
+                  iconSize: [30, 38],
+                  iconAnchor: [15, 50],
+                  popupAnchor: [0, -50]
+              }) 
+          })
+          .addTo(map)
+          .bindPopup("<b>Customer</b>");
+      });
+  }
+
+  // Call the function to fetch markers from Supabase
+  fetchMarkers();
   // Forgot Password Form Handler (optional)
   // Similar logic can be added if you want to implement this functionality
   // ...
