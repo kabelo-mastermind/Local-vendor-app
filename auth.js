@@ -5,47 +5,50 @@ if (!window.supabase) {
   const supabase = window.supabase;
   let currentUser = null;
 
+  // Utility function to insert or update user data in the 'clients' table
+  async function saveUserData(user, name) {
+    try {
+      const { data, error } = await supabase
+        .from("clients")
+        .upsert([
+          {
+            id: user.id, // Supabase Auth user ID
+            name: name || user.user_metadata.name || null,
+            email: user.email,
+          },
+        ]);
+
+      if (error) throw new Error(error.message);
+      console.log("User data saved successfully:", data);
+    } catch (err) {
+      console.error("Error saving user data:", err.message);
+      alert("Failed to save user data. Please try again.");
+    }
+  }
+
   // Sign-up form handler
   const signupForm = document.getElementById("signupModal");
   signupForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    
+
     const name = document.getElementById("name").value;
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
-  
-    // Sign-up with Supabase Auth
-    const { user, session, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: { name: name },
-      },
-    });
-  
-    if (error) {
-      alert(error.message);
-    } else {
+
+    try {
+      const { user, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: { data: { name } },
+      });
+
+      if (error) throw new Error(error.message);
+
       alert("Sign-up successful! Please check your email to confirm your account.");
-  
-      // After signup, insert the user data into the 'clients' table
-      if (user && user.id) {
-        const { data, error: insertError } = await supabase
-          .from("clients")
-          .insert([{
-            id: user.id,  // user id from the Supabase Auth system
-            name: name,
-            email: email,
-        }]);
-        if (insertError) {
-          console.error("Error inserting user data into the database:", insertError.message);
-          alert("There was an error saving your user data. Please try again.");
-        } else {
-          console.log("User data saved successfully:", data);
-        }
-      } else {
-        console.error("User ID is not available.");
-      }
+      if (user && user.id) await saveUserData(user, name);
+    } catch (err) {
+      console.error("Sign-up error:", err.message);
+      alert(err.message);
     }
   });
 
@@ -53,78 +56,50 @@ if (!window.supabase) {
   const signinForm = document.getElementById("signinModal");
   signinForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    
+
     const email = document.getElementById("signinEmail").value;
     const password = document.getElementById("signinPassword").value;
-  
-    const { user, session, error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    });
-  
-    if (error) {
-      alert(error.message);
-    } else {
+
+    try {
+      const { user, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) throw new Error(error.message);
+
       alert("Sign-in successful!");
-  
-      // After login, check if the user exists in the 'users' table
-      const { data, error: insertError } = await supabase
-        .from("clients")
-        .upsert([ // Using upsert to insert or update the user
-          {
-            id: user.id,  // user id from the Supabase Auth system
-            name: user.user_metadata.name || null,
-            email: user.email,
-            profile_picture: user.user_metadata.profile_picture || null, // Optional: if you want to store profile picture
-          }
-        ]);
-  
-      if (insertError) {
-        console.error("Error inserting user data into the database:", insertError.message);
-        alert("There was an error saving your user data. Please try again.");
-      } else {
-        console.log("User data saved successfully:", data);
-      }
+      if (user && user.id) await saveUserData(user, user.user_metadata.name);
+    } catch (err) {
+      console.error("Sign-in error:", err.message);
+      alert(err.message);
     }
   });
 
-  // Sign-out button handler
-  const signoutBtn = document.getElementById('sign-out');
-  signoutBtn.addEventListener('click', async () => {
-    const { error } = await supabase.auth.signOut();
+  // Sign-out handler
+  const signoutBtn = document.getElementById("sign-out");
+  signoutBtn.addEventListener("click", async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw new Error(error.message);
 
-    if (error) {
-      alert(error.message);
-    } else {
       clearSessionData();
-      alert('Signed out successfully!');
-      window.location.href = 'https://zambane.netlify.app/';
+      alert("Signed out successfully!");
+      window.location.href = "https://zambane.netlify.app/";
+    } catch (err) {
+      console.error("Sign-out error:", err.message);
+      alert(err.message);
     }
   });
 
   // Clear session data
   function clearSessionData() {
     currentUser = null;
-    // Clear any other session-related data here
-    console.log('Session data cleared');
+    console.log("Session data cleared");
   }
 
-  // Authentication state change listener
-  supabase.auth.onAuthStateChange((event, session) => {
-    if (event === "SIGNED_OUT") {
-      currentUser = null;
-    } else if (event === "SIGNED_IN") {
-      console.log("User session login", session.user);
-      currentUser = session.user;
-    }
-    updateButtons();
-  });
-
-  // Button references
-  const getStartedBtn = document.getElementById("getStartedBtn");
-  const makeRequestBtn = document.getElementById("makeRequestBtn");
-
+  // Update UI buttons based on authentication state
   function updateButtons() {
+    const getStartedBtn = document.getElementById("getStartedBtn");
+    const makeRequestBtn = document.getElementById("makeRequestBtn");
+
     if (currentUser) {
       getStartedBtn.style.display = "none";
       makeRequestBtn.style.display = "inline-block";
@@ -134,45 +109,35 @@ if (!window.supabase) {
     }
   }
 
-  // Fetch session on initial load
-  (async () => {
-    const { data: session } = await supabase.auth.getSession();
-    if (session) {
-      currentUser = session.user;
-      console.log("User is logged in:", currentUser);
-    } else {
-      currentUser = null;
-      console.log("User is not logged in.");
-    }
-    updateButtons();
-  })();
+  // Location save function
+  async function saveLocation(latitude, longitude) {
+    try {
+      const { data, error } = await supabase
+        .from("current_locations")
+        .insert([
+          {
+            user_id: currentUser.id,
+            latitude: latitude,
+            longitude: longitude,
+          },
+        ]);
 
-  // Get current location and store in Supabase
+      if (error) throw new Error(error.message);
+      console.log("Location data saved successfully:", data);
+      alert("Your location has been saved successfully.");
+    } catch (err) {
+      console.error("Error saving location data:", err.message);
+      alert("Failed to save your location. Please try again.");
+    }
+  }
+
+  // Geolocation handling
+  const makeRequestBtn = document.getElementById("makeRequestBtn");
   if (makeRequestBtn) {
-    makeRequestBtn.addEventListener("click", async () => {
-      // Check if geolocation is available
+    makeRequestBtn.addEventListener("click", () => {
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
-
-            // Save location to Supabase
-            const { data, error } = await supabase
-              .from("current_locations")
-              .insert([{
-                user_id: currentUser.id,  // Assuming currentUser is set after login
-                latitude: latitude,
-                longitude: longitude,
-              }]);
-
-            if (error) {
-              console.error("Error saving location data:", error.message);
-              alert("There was an error saving your location. Please try again.");
-            } else {
-              console.log("Location data saved successfully:", data);
-              alert("Your location has been saved successfully.");
-            }
-          },
+          (position) => saveLocation(position.coords.latitude, position.coords.longitude),
           (error) => {
             console.error("Error getting location:", error.message);
             alert("Unable to retrieve your location. Please try again.");
@@ -184,41 +149,60 @@ if (!window.supabase) {
     });
   }
 
-  // Initialize the map
-  var map = L.map('map').setView([-25.5416, 28.0992], 13); // Centered in Soshanguve
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  // Fetch current session on page load
+  (async () => {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) throw new Error(error.message);
+
+      if (session) {
+        currentUser = session.user;
+        console.log("User is logged in:", currentUser);
+      } else {
+        currentUser = null;
+        console.log("User is not logged in.");
+      }
+
+      updateButtons();
+    } catch (err) {
+      console.error("Error fetching session:", err.message);
+    }
+  })();
+
+  // Map initialization
+  const map = L.map("map").setView([-25.5416, 28.0992], 13); // Centered in Soshanguve
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
   }).addTo(map);
 
-  // Fetch customer coordinates from Supabase
+  // Fetch customer markers
   async function fetchMarkers() {
-    // Fetch customer data
-    const { data: customers, error: customerError } = await supabase
-      .from('current_locations') // Replace with your actual table name
-      .select('latitude, longitude'); // Assuming these are the columns for coordinates
+    try {
+      const { data: customers, error } = await supabase
+        .from("current_locations")
+        .select("latitude, longitude");
 
-    if (customerError) {
-      console.error("Error fetching current locations:", customerError);
-      alert("Failed to fetch customer data. Please try again later.");
-      return;
-    }
+      if (error) throw new Error(error.message);
 
-    // Add customer markers
-    customers.forEach(customer => {
-      L.marker([customer.latitude, customer.longitude], {
-        icon: L.icon({
-          iconUrl: './assets/markers/customer.jpg',
-          iconSize: [30, 38],
-          iconAnchor: [15, 50],
-          popupAnchor: [0, -50]
+      customers.forEach((customer) => {
+        L.marker([customer.latitude, customer.longitude], {
+          icon: L.icon({
+            iconUrl: "./assets/markers/customer.jpg",
+            iconSize: [30, 38],
+            iconAnchor: [15, 50],
+            popupAnchor: [0, -50],
+          }),
         })
-      })
-        .addTo(map)
-        .bindPopup("<b>Customer</b>");
-    });
+          .addTo(map)
+          .bindPopup("<b>Customer</b>");
+      });
+    } catch (err) {
+      console.error("Error fetching markers:", err.message);
+      alert("Failed to load map markers. Please try again later.");
+    }
   }
 
-  // Call the function to fetch markers from Supabase
+  // Load markers on map
   fetchMarkers();
 }
