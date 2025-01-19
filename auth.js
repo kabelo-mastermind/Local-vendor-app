@@ -41,6 +41,8 @@ if (!window.supabase) {
 
       // Save the user in the 'clients' table after email confirmation
       const success = await saveUserData(currentUser);
+      // Fetch and plot all locations after signing in
+      fetchAndPlotLocations();
       if (success) {
         console.log("User data saved successfully after email confirmation.");
       } else {
@@ -156,144 +158,144 @@ if (!window.supabase) {
   })();
 
   // get current user location and store it under current_locations table
-// Event listener for "Make Request" button
-const makeRequestBtn = document.getElementById("makeRequestBtn");
-makeRequestBtn.addEventListener("click", async () => {
-  if (!currentUser) {
-    alert("You need to be logged in to make a request.");
-    return;
-  }
-
-  // Check if geolocation is available
-  if ("geolocation" in navigator) {
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-
-        console.log("Current Location:", latitude, longitude);
-
-        try {
-          // Check if a location already exists for the current user
-          const { data: existingLocation, error: fetchError } = await supabase
-            .from("current_locations")
-            .select("*")
-            .eq("user_id", currentUser.id)
-            .single();  // We expect a single entry (if exists)
-
-          if (fetchError) {
-            console.error("Error fetching existing location:", fetchError.message);
-            alert("Failed to fetch existing location data.");
-            return;
-          }
-
-          // If a location exists, update it, otherwise, insert new data
-          const locationData = {
-            user_id: currentUser.id,
-            latitude,
-            longitude,
-          };
-
-          let result;
-
-          if (existingLocation) {
-            // Update existing location if found
-            const { data, error } = await supabase
-              .from("current_locations")
-              .update(locationData)
-              .eq("user_id", currentUser.id);
-
-            result = data;
-            if (error) {
-              console.error("Error updating location:", error.message);
-              alert("Failed to update your location. Please try again.");
-              return;
-            }
-          } else {
-            // Insert new location if none exists
-            const { data, error } = await supabase
-              .from("current_locations")
-              .upsert([locationData]);
-
-            result = data;
-            if (error) {
-              console.error("Error saving location:", error.message);
-              alert("Failed to save your location. Please try again.");
-              return;
-            }
-          }
-
-          console.log("Location saved/updated:", result);
-          alert("Your location has been saved/updated successfully.");
-
-          // After saving the location, fetch the coordinates and plot them
-          fetchAndPlotLocations();
-        } catch (err) {
-          console.error("Error in saving location:", err.message);
-          alert("An error occurred while saving your location.");
-        }
-      },
-      (error) => {
-        console.error("Error getting geolocation:", error.message);
-        alert("Failed to get your location. Please enable location services.");
-      }
-    );
-  } else {
-    alert("Geolocation is not available on your device.");
-  }
-});
-
-
-// Fetch and plot coordinates on the map
-async function fetchAndPlotLocations() {
-  try {
-    // Fetch all locations, no filter by user_id
-    const { data: locations, error } = await supabase
-      .from("current_locations")
-      .select("latitude, longitude");
-
-    if (error) {
-      console.error("Error fetching locations:", error.message);
-      alert("Failed to load locations.");
+  // Event listener for "Make Request" button
+  const makeRequestBtn = document.getElementById("makeRequestBtn");
+  makeRequestBtn.addEventListener("click", async () => {
+    if (!currentUser) {
+      alert("You need to be logged in to make a request.");
       return;
     }
 
-    // Clear existing markers before plotting new ones
-    map.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
-        map.removeLayer(layer);
+    // Check if geolocation is available
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+
+          console.log("Current Location:", latitude, longitude);
+
+          try {
+            // Check if a location already exists for the current user
+            const { data: existingLocation, error: fetchError } = await supabase
+              .from("current_locations")
+              .select("*")
+              .eq("user_id", currentUser.id)
+              .single();  // We expect a single entry (if exists)
+
+            if (fetchError) {
+              console.error("Error fetching existing location:", fetchError.message);
+              alert("Failed to fetch existing location data.");
+              return;
+            }
+
+            // If a location exists, update it, otherwise, insert new data
+            const locationData = {
+              user_id: currentUser.id,
+              latitude,
+              longitude,
+            };
+
+            let result;
+
+            if (existingLocation) {
+              // Update existing location if found
+              const { data, error } = await supabase
+                .from("current_locations")
+                .update(locationData)
+                .eq("user_id", currentUser.id);
+
+              result = data;
+              if (error) {
+                console.error("Error updating location:", error.message);
+                alert("Failed to update your location. Please try again.");
+                return;
+              }
+            } else {
+              // Insert new location if none exists
+              const { data, error } = await supabase
+                .from("current_locations")
+                .upsert([locationData]);
+
+              result = data;
+              if (error) {
+                console.error("Error saving location:", error.message);
+                alert("Failed to save your location. Please try again.");
+                return;
+              }
+            }
+
+            console.log("Location saved/updated:", result);
+            alert("Your location has been saved/updated successfully.");
+
+            // After saving the location, fetch the coordinates and plot them
+            fetchAndPlotLocations();
+          } catch (err) {
+            console.error("Error in saving location:", err.message);
+            alert("An error occurred while saving your location.");
+          }
+        },
+        (error) => {
+          console.error("Error getting geolocation:", error.message);
+          alert("Failed to get your location. Please enable location services.");
+        }
+      );
+    } else {
+      alert("Geolocation is not available on your device.");
+    }
+  });
+
+
+  // Fetch and plot coordinates for all users
+  async function fetchAndPlotLocations() {
+    try {
+      // Fetch all locations from the current_locations table
+      const { data: locations, error } = await supabase
+        .from("current_locations")
+        .select("latitude, longitude");
+
+      if (error) {
+        console.error("Error fetching locations:", error.message);
+        alert("Failed to load locations.");
+        return;
       }
-    });
 
-    // Plot all the locations on the map
-    locations.forEach((location) => {
-      const { latitude, longitude } = location;
+      // Clear existing markers before plotting new ones
+      map.eachLayer((layer) => {
+        if (layer instanceof L.Marker) {
+          map.removeLayer(layer);
+        }
+      });
 
-      L.marker([latitude, longitude], {
-        icon: L.icon({
-          iconUrl: "./assets/markers/customer.jpg",
-          iconSize: [30, 38],
-          iconAnchor: [15, 50],
-          popupAnchor: [0, -50],
-        }),
-      })
-        .addTo(map)
-        .bindPopup("<b>Customer Location</b>");
-    });
-  } catch (err) {
-    console.error("Error fetching locations:", err.message);
-    alert("An error occurred while fetching locations.");
+      // Plot all locations on the map
+      locations.forEach((location) => {
+        const { latitude, longitude } = location;
+
+        L.marker([latitude, longitude], {
+          icon: L.icon({
+            iconUrl: "./assets/markers/customer.jpg",
+            iconSize: [30, 38],
+            iconAnchor: [15, 50],
+            popupAnchor: [0, -50],
+          }),
+        })
+          .addTo(map)
+          .bindPopup("<b>Location</b>");
+      });
+    } catch (err) {
+      console.error("Error fetching locations:", err.message);
+      alert("An error occurred while fetching locations.");
+    }
   }
-}
 
-// Initialize the map
-const map = L.map("map").setView([-25.5416, 28.0992], 13); // Centered in Soshanguve
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  maxZoom: 19,
-  attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
-}).addTo(map);
+  // Initialize the map
+  const map = L.map("map").setView([-25.5416, 28.0992], 13); // Centered in Soshanguve
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+  }).addTo(map);
 
-// Fetch and plot locations on map at the beginning
-fetchAndPlotLocations();
+  // Fetch and plot locations on map at the beginning
+  fetchAndPlotLocations();
 
 
 }
