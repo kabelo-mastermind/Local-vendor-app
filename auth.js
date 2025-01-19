@@ -125,7 +125,7 @@ if (!window.supabase) {
 
   if (makeRequestBtn) {
     makeRequestBtn.addEventListener("click", () => {
-      console.log("Request made");
+      console.log("Request made successfully");
       // Add any additional logic here for handling the request
     });
   }
@@ -140,7 +140,7 @@ forgotPasswordForm.addEventListener("submit", async (e) => {
 
   if (!email) {
     messageDiv.style.display = "block";
-    messageDiv.textContent = "Please enter your email address.";
+    messageDiv.textContent = "Please enter your valid email address.";
     messageDiv.style.color = "red";
     return;
   }
@@ -218,6 +218,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("Access token is missing");
   }
 });
-
-
 }
