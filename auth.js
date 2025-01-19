@@ -139,7 +139,7 @@ forgotPasswordForm.addEventListener("submit", async (e) => {
   try {
     // Send password reset email
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "https://zambane.netlify.app/", // Update this URL
+      redirectTo: "https://zambane.netlify.app/index.html", // Update this URL
     });
 
     if (error) {
