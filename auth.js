@@ -173,63 +173,63 @@ makeRequestBtn.addEventListener("click", async () => {
         console.log("Current Location:", latitude, longitude);
 
         try {
-          // Check if the user already has a location in the 'current_locations' table
+          // Check if a location already exists for the current user
           const { data: existingLocation, error: fetchError } = await supabase
             .from("current_locations")
-            .select("id")
+            .select("*")
             .eq("user_id", currentUser.id)
-            .single();  // We expect a single record for each user
+            .single();  // We expect a single entry (if exists)
 
           if (fetchError) {
-            console.error("Error fetching location:", fetchError.message);
-            alert("Failed to check for existing location. Please try again.");
+            console.error("Error fetching existing location:", fetchError.message);
+            alert("Failed to fetch existing location data.");
             return;
           }
 
-          let response;
+          // If a location exists, update it, otherwise, insert new data
+          const locationData = {
+            user_id: currentUser.id,
+            latitude,
+            longitude,
+          };
 
-          // If a location already exists for the user, update it
+          let result;
+
           if (existingLocation) {
+            // Update existing location if found
             const { data, error } = await supabase
               .from("current_locations")
-              .update({ latitude, longitude })
+              .update(locationData)
               .eq("user_id", currentUser.id);
 
+            result = data;
             if (error) {
               console.error("Error updating location:", error.message);
               alert("Failed to update your location. Please try again.");
-            } else {
-              response = data;
-              console.log("Location updated:", data);
-              alert("Your location has been updated successfully.");
+              return;
             }
           } else {
-            // If no location exists, insert a new record
-            const { data, error } = await supabase.from("current_locations").upsert([
-              {
-                user_id: currentUser.id,  // The logged-in user's ID
-                latitude,
-                longitude,
-              },
-            ]);
+            // Insert new location if none exists
+            const { data, error } = await supabase
+              .from("current_locations")
+              .upsert([locationData]);
 
+            result = data;
             if (error) {
               console.error("Error saving location:", error.message);
               alert("Failed to save your location. Please try again.");
-            } else {
-              response = data;
-              console.log("Location saved:", data);
-              alert("Your location has been saved successfully.");
+              return;
             }
           }
 
-          // After saving or updating the location, fetch and plot all locations for the user
-          if (response) {
-            fetchAndPlotLocations();
-          }
+          console.log("Location saved/updated:", result);
+          alert("Your location has been saved/updated successfully.");
+
+          // After saving the location, fetch the coordinates and plot them
+          fetchAndPlotLocations();
         } catch (err) {
-          console.error("Error in saving/updating location:", err.message);
-          alert("An error occurred while saving/updating your location.");
+          console.error("Error in saving location:", err.message);
+          alert("An error occurred while saving your location.");
         }
       },
       (error) => {
