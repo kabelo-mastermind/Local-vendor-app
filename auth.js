@@ -242,17 +242,18 @@ makeRequestBtn.addEventListener("click", async () => {
   }
 });
 
+
 // Fetch and plot coordinates on the map
 async function fetchAndPlotLocations() {
   try {
+    // Fetch all locations, no filter by user_id
     const { data: locations, error } = await supabase
       .from("current_locations")
-      .select("latitude, longitude")
-
+      .select("latitude, longitude");
 
     if (error) {
       console.error("Error fetching locations:", error.message);
-      alert("Failed to load your locations.");
+      alert("Failed to load locations.");
       return;
     }
 
@@ -263,7 +264,7 @@ async function fetchAndPlotLocations() {
       }
     });
 
-    // Plot the user's location(s) on the map
+    // Plot all the locations on the map
     locations.forEach((location) => {
       const { latitude, longitude } = location;
 
@@ -280,7 +281,7 @@ async function fetchAndPlotLocations() {
     });
   } catch (err) {
     console.error("Error fetching locations:", err.message);
-    alert("An error occurred while fetching your locations.");
+    alert("An error occurred while fetching locations.");
   }
 }
 
