@@ -259,3 +259,4 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 
 // Fetch and plot locations on map at the beginning
 fetchAndPlotLocations();
+}
