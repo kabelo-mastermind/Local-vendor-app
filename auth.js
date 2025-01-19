@@ -9,10 +9,12 @@ if (!window.supabase) {
   const signupForm = document.getElementById("signupModal");
   signupForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    
     const name = document.getElementById("name").value;
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
-
+  
+    // Sign-up with Supabase Auth
     const { user, session, error } = await supabase.auth.signUp({
       email: email,
       password: password,
@@ -20,24 +22,24 @@ if (!window.supabase) {
         data: { name: name },
       },
     });
-
+  
     if (error) {
       alert(error.message);
     } else {
       alert("Sign-up successful! Please check your email to confirm your account.");
-
-      // Save user data in the 'users' table after sign-up
+  
+      // After signup, insert the user data into the 'users' table
       const { data, error: insertError } = await supabase
         .from("users")
-        .insert([
+        .upsert([ // Using upsert to insert or update the user
           {
-            id: user.id,
+            id: user.id,  // user id from the Supabase Auth system
             name: name,
             email: email,
-            password: password, // Consider hashing the password before storing it in production
-          },
+            profile_picture: user.user_metadata.profile_picture || null, // Optional: if you want to store profile picture
+          }
         ]);
-
+  
       if (insertError) {
         console.error("Error inserting user data into the database:", insertError.message);
         alert("There was an error saving your user data. Please try again.");
@@ -46,30 +48,47 @@ if (!window.supabase) {
       }
     }
   });
+  
 
   // Sign-in form handler
   const signinForm = document.getElementById("signinModal");
   signinForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    
     const email = document.getElementById("signinEmail").value;
     const password = document.getElementById("signinPassword").value;
-
+  
     const { user, session, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
     });
-
+  
     if (error) {
       alert(error.message);
     } else {
       alert("Sign-in successful!");
-      // Close all modals
-      const modals = document.querySelectorAll(".modal");
-      modals.forEach((modal) => {
-        modal.style.display = "none";
-      });
+  
+      // After login, check if the user exists in the 'users' table
+      const { data, error: insertError } = await supabase
+        .from("users")
+        .upsert([ // Using upsert to insert or update the user
+          {
+            id: user.id,  // user id from the Supabase Auth system
+            name: user.user_metadata.name || null,
+            email: user.email,
+            profile_picture: user.user_metadata.profile_picture || null, // Optional: if you want to store profile picture
+          }
+        ]);
+  
+      if (insertError) {
+        console.error("Error inserting user data into the database:", insertError.message);
+        alert("There was an error saving your user data. Please try again.");
+      } else {
+        console.log("User data saved successfully:", data);
+      }
     }
   });
+  
 
   // Sign-out button handler
   const signoutBtn = document.getElementById('sign-out');
