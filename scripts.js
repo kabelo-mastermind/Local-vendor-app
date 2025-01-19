@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
       
         // Show the Reset Password Modal if ?reset=true
         if (isResetPassword) {
-          const resetModal = document.getElementById('ForgotPassword');
+          const resetModal = document.getElementById('resetPasswordForm');
           resetModal.style.display = 'block';
         }
       });
