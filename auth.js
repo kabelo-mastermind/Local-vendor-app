@@ -155,6 +155,55 @@ if (!window.supabase) {
     }
   })();
 
+  // get current user location and store it under current_locations table
+  // Event listener for "Make Request" button
+const makeRequestBtn = document.getElementById("makeRequestBtn");
+makeRequestBtn.addEventListener("click", async () => {
+  if (!currentUser) {
+    alert("You need to be logged in to make a request.");
+    return;
+  }
+
+  // Check if geolocation is available
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        console.log("Current Location:", latitude, longitude);
+
+        try {
+          // Save the location data to the 'current_locations' table
+          const { data, error } = await supabase.from("current_locations").upsert([
+            {
+              user_id: currentUser.id,  // The logged-in user's ID
+              latitude,
+              longitude,
+            },
+          ]);
+
+          if (error) {
+            console.error("Error saving location:", error.message);
+            alert("Failed to save your location. Please try again.");
+          } else {
+            console.log("Location saved:", data);
+            alert("Your location has been saved successfully.");
+          }
+        } catch (err) {
+          console.error("Error in saving location:", err.message);
+          alert("An error occurred while saving your location.");
+        }
+      },
+      (error) => {
+        console.error("Error getting geolocation:", error.message);
+        alert("Failed to get your location. Please enable location services.");
+      }
+    );
+  } else {
+    alert("Geolocation is not available on your device.");
+  }
+});
+
   // Map initialization
   const map = L.map("map").setView([-25.5416, 28.0992], 13); // Centered in Soshanguve
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
