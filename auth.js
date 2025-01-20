@@ -32,7 +32,7 @@ if (!window.supabase) {
       return false;
     }
   };
-
+  let hasReloaded = false;  // Flag to track if the page has already reloaded
   // Listen for authentication state changes
   supabase.auth.onAuthStateChange(async (event, session) => {
     if (event === "SIGNED_IN" && session?.user) {
@@ -41,8 +41,11 @@ if (!window.supabase) {
 
       // Fetch and plot all locations after signing in
       updateButtons(); // Update buttons after successful sign-in
-      // Reload the page after successful login
-      window.location.reload();
+      // Reload the page only once after the first successful login
+      if (!hasReloaded) {
+        hasReloaded = true;
+        window.location.reload();
+      }
       fetchAndPlotLocations();
     } else if (event === "SIGNED_OUT") {
       console.log("User signed out.");
