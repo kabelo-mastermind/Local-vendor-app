@@ -44,11 +44,10 @@ if (!window.supabase) {
       // Reload the page only once after the first successful login
       if (!hasReloaded) {
         hasReloaded = true;
+        // Store the session in localStorage to remember the login state across page reloads
+        localStorage.setItem('userLoggedIn', 'true');
         window.location.reload();
       }
-         // Store the session in localStorage to remember the login state across page reloads
-         localStorage.setItem('userLoggedIn', 'true');
-         window.location.reload();
       fetchAndPlotLocations();
     } else if (event === "SIGNED_OUT") {
       console.log("User signed out.");
