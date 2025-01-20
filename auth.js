@@ -46,13 +46,15 @@ if (!window.supabase) {
         hasReloaded = true;
         window.location.reload();
       }
+         // Store the session in localStorage to remember the login state across page reloads
+         localStorage.setItem('userLoggedIn', 'true');
+         window.location.reload();
       fetchAndPlotLocations();
     } else if (event === "SIGNED_OUT") {
       console.log("User signed out.");
       currentUser = null;
       updateButtons(); // Update buttons after successful sign-in
-      // Optionally, clear the locations from the map when logged out
-      map.eachLayer((layer) => {
+      // Optionally, clear the locations from the map when logged out      map.eachLayer((layer) => {
         if (layer instanceof L.Marker) {
           map.removeLayer(layer);
         }
@@ -179,7 +181,14 @@ if (!window.supabase) {
         console.log("User is not logged in.");
       }
 
-      updateButtons();
+    // Check if user is logged in via localStorage
+    if (localStorage.getItem('userLoggedIn') === 'true') {
+      currentUser = session.user; // Set current user from session
+      updateButtons(); // Update buttons based on session state
+    } else {
+      updateButtons(); // If not logged in, update the UI accordingly
+    }
+      // updateButtons();
     } catch (err) {
       console.error("Error fetching session:", err.message);
     }
