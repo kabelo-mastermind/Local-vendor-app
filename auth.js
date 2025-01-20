@@ -81,36 +81,36 @@ if (!window.supabase) {
     }
   });
 
-// Sign-in form handler
-const signinForm = document.getElementById("signinModal");
-signinForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+  // Sign-in form handler
+  const signinForm = document.getElementById("signinModal");
+  signinForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  const email = document.getElementById("signinEmail").value;
-  const password = document.getElementById("signinPassword").value;
+    const email = document.getElementById("signinEmail").value;
+    const password = document.getElementById("signinPassword").value;
 
-  try {
-    const { user, error } = await supabase.auth.signInWithPassword({ email, password });
+    try {
+      const { user, error } = await supabase.auth.signInWithPassword({ email, password });
 
-    if (error) throw new Error(error.message);
+      if (error) throw new Error(error.message);
 
-    // Close the modal after successful login
-    document.getElementById("signinModal").style.display = "none"; // Hide the modal
+      // Close the modal after successful login
+      document.getElementById("signinModal").style.display = "none"; // Hide the modal
 
-    alert("Sign-in successful!");
+      alert("Sign-in successful!");
 
-    // Update the UI to reflect login state
-    currentUser = user;
-    updateButtons();
+      // Update the UI to reflect login state
+      currentUser = user;
+      updateButtons();
 
-    // Now you can make requests after successful login
-    fetchAndPlotLocations(); // Optionally call any other methods for post-login actions
+      // Now you can make requests after successful login
+      fetchAndPlotLocations(); // Optionally call any other methods for post-login actions
 
-  } catch (err) {
-    console.error("Sign-in error:", err.message);
-    alert(err.message);
-  }
-});
+    } catch (err) {
+      console.error("Sign-in error:", err.message);
+      alert(err.message);
+    }
+  });
 
 
   // Sign-out handler
@@ -140,25 +140,25 @@ signinForm.addEventListener("submit", async (e) => {
   });
 
 
- // Update the UI buttons based on authentication state
-function updateButtons() {
-  const getStartedBtn = document.getElementById("getStartedBtn");
-  const makeRequestBtn = document.getElementById("makeRequestBtn");
+  // Update the UI buttons based on authentication state
+  function updateButtons() {
+    const getStartedBtn = document.getElementById("getStartedBtn");
+    const makeRequestBtn = document.getElementById("makeRequestBtn");
 
-  if (!getStartedBtn || !makeRequestBtn) {
-    console.error("Buttons not found in the DOM. Ensure the button IDs are correct.");
-    return;
-  }
+    if (!getStartedBtn || !makeRequestBtn) {
+      console.error("Buttons not found in the DOM. Ensure the button IDs are correct.");
+      return;
+    }
 
-  // Update button visibility based on the authentication state
-  if (currentUser) {
-    getStartedBtn.style.display = "none"; // Hide the 'Get Started' button
-    makeRequestBtn.style.display = "inline-block"; // Show the 'Make Request' button
-  } else {
-    getStartedBtn.style.display = "inline-block"; // Show the 'Get Started' button
-    makeRequestBtn.style.display = "none"; // Hide the 'Make Request' button
+    // Update button visibility based on the authentication state
+    if (currentUser) {
+      getStartedBtn.style.display = "none"; // Hide the 'Get Started' button
+      makeRequestBtn.style.display = "inline-block"; // Show the 'Make Request' button
+    } else {
+      getStartedBtn.style.display = "inline-block"; // Show the 'Get Started' button
+      makeRequestBtn.style.display = "none"; // Hide the 'Make Request' button
+    }
   }
-}
 
   // Fetch current session on page load
   (async () => {
@@ -196,7 +196,8 @@ function updateButtons() {
           const { latitude, longitude } = position.coords;
 
           console.log("Current Location:", latitude, longitude);
-
+          // Update map view to the current location
+          map.setView([latitude, longitude], 13); // Update map center to user's location
           try {
             // Check if a location already exists for the current user
             const { data: existingLocation, error: fetchError } = await supabase
@@ -318,7 +319,7 @@ function updateButtons() {
 
 
   // Initialize the map
-  const map = L.map("map").setView([-25.5416, 28.0992], 13); // Centered in Soshanguve
+  const map = L.map("map").setView([-25.5416, 28.0992], 13); // Default view
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: "&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
