@@ -97,7 +97,7 @@ if (!window.supabase) {
       // Close the modal after successful login
       document.getElementById("signinModal").style.display = "none"; // Hide the modal
 
-      alert("Sign-in successful!");
+      alert("Sign-in successful refresh page!");
 
       // Update the UI to reflect login state
       currentUser = user;
