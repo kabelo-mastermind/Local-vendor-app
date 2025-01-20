@@ -272,7 +272,7 @@ function updateButtons() {
   // Fetch and plot coordinates for all users only if the user is logged in
   async function fetchAndPlotLocations() {
     if (!currentUser) {
-      alert("You need to be logged in to view locations.");
+      alert("Reload the page or loggin by pressing get started to make request");
       return; // Exit the function if no user is logged in
     }
 
