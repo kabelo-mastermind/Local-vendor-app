@@ -207,7 +207,7 @@ function updateButtons() {
 
             if (fetchError) {
               console.error("Error fetching existing location:", fetchError.message);
-              alert("Failed to fetch existing location data.");
+              alert("Location already requested.");
               return;
             }
 
