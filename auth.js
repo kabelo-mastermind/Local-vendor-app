@@ -4,7 +4,7 @@ if (!window.supabase) {
 } else {
   const supabase = window.supabase;
   let currentUser = null;
-
+  let hasReloaded = false;  // Flag to track if the page has already reloaded
   // Utility function to insert or update user data in the 'clients' table
   const saveUserData = async (user) => {
     try {
@@ -32,7 +32,7 @@ if (!window.supabase) {
       return false;
     }
   };
-  let hasReloaded = false;  // Flag to track if the page has already reloaded
+  
   // Listen for authentication state changes
   supabase.auth.onAuthStateChange(async (event, session) => {
     if (event === "SIGNED_IN" && session?.user) {
