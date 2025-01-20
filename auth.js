@@ -54,7 +54,8 @@ if (!window.supabase) {
       console.log("User signed out.");
       currentUser = null;
       updateButtons(); // Update buttons after successful sign-in
-      // Optionally, clear the locations from the map when logged out      map.eachLayer((layer) => {
+      // Optionally, clear the locations from the map when logged out
+      map.eachLayer((layer) => {
         if (layer instanceof L.Marker) {
           map.removeLayer(layer);
         }
