@@ -185,7 +185,7 @@ function updateButtons() {
   const makeRequestBtn = document.getElementById("makeRequestBtn");
   makeRequestBtn.addEventListener("click", async () => {
     if (!currentUser) {
-      alert("You need to be logged in to make a request.");
+      alert("Reload the page or loggin by pressing get started to make request");
       return;
     }
 
