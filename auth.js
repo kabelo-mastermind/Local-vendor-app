@@ -272,10 +272,10 @@ if (!window.supabase) {
   // Fetch and plot coordinates for all users
   // Fetch and plot coordinates for all users only if the user is logged in
   async function fetchAndPlotLocations() {
-    // if (!currentUser) {
-    //   // alert("Press get started, Sign in and refresh page then request");
-    //   return; // Exit the function if no user is logged in
-    // }
+    if (!currentUser) {
+      // alert("Press get started, Sign in and refresh page then request");
+      return; // Exit the function if no user is logged in
+    }
 
     try {
       // Fetch all locations from the current_locations table
