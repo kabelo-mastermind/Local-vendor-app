@@ -4,7 +4,7 @@ if (!window.supabase) {
 } else {
   const supabase = window.supabase;
   let currentUser = null;
-  let hasReloaded = false;  // Flag to track if the page has already reloaded
+
   // Utility function to insert or update user data in the 'clients' table
   const saveUserData = async (user) => {
     try {
@@ -32,7 +32,7 @@ if (!window.supabase) {
       return false;
     }
   };
-  
+
   // Listen for authentication state changes
   supabase.auth.onAuthStateChange(async (event, session) => {
     if (event === "SIGNED_IN" && session?.user) {
@@ -41,13 +41,6 @@ if (!window.supabase) {
 
       // Fetch and plot all locations after signing in
       updateButtons(); // Update buttons after successful sign-in
-      // Reload the page only once after the first successful login
-      if (!hasReloaded) {
-        hasReloaded = true;
-        // Store the session in localStorage to remember the login state across page reloads
-        localStorage.setItem('userLoggedIn', 'true');
-        window.location.reload();
-      }
       fetchAndPlotLocations();
     } else if (event === "SIGNED_OUT") {
       console.log("User signed out.");
@@ -88,36 +81,36 @@ if (!window.supabase) {
     }
   });
 
-  // Sign-in form handler
-  const signinForm = document.getElementById("signinModal");
-  signinForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+// Sign-in form handler
+const signinForm = document.getElementById("signinModal");
+signinForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    const email = document.getElementById("signinEmail").value;
-    const password = document.getElementById("signinPassword").value;
+  const email = document.getElementById("signinEmail").value;
+  const password = document.getElementById("signinPassword").value;
 
-    try {
-      const { user, error } = await supabase.auth.signInWithPassword({ email, password });
+  try {
+    const { user, error } = await supabase.auth.signInWithPassword({ email, password });
 
-      if (error) throw new Error(error.message);
+    if (error) throw new Error(error.message);
 
-      // Close the modal after successful login
-      document.getElementById("signinModal").style.display = "none"; // Hide the modal
+    // Close the modal after successful login
+    document.getElementById("signinModal").style.display = "none"; // Hide the modal
 
-      alert("Sign-in successful!");
+    alert("Sign-in successful!");
 
-      // Update the UI to reflect login state
-      currentUser = user;
-      updateButtons();
+    // Update the UI to reflect login state
+    currentUser = user;
+    updateButtons();
 
-      // Now you can make requests after successful login
-      fetchAndPlotLocations(); // Optionally call any other methods for post-login actions
+    // Now you can make requests after successful login
+    fetchAndPlotLocations(); // Optionally call any other methods for post-login actions
 
-    } catch (err) {
-      console.error("Sign-in error:", err.message);
-      alert(err.message);
-    }
-  });
+  } catch (err) {
+    console.error("Sign-in error:", err.message);
+    alert(err.message);
+  }
+});
 
 
   // Sign-out handler
@@ -147,25 +140,25 @@ if (!window.supabase) {
   });
 
 
-  // Update the UI buttons based on authentication state
-  function updateButtons() {
-    const getStartedBtn = document.getElementById("getStartedBtn");
-    const makeRequestBtn = document.getElementById("makeRequestBtn");
+ // Update the UI buttons based on authentication state
+function updateButtons() {
+  const getStartedBtn = document.getElementById("getStartedBtn");
+  const makeRequestBtn = document.getElementById("makeRequestBtn");
 
-    if (!getStartedBtn || !makeRequestBtn) {
-      console.error("Buttons not found in the DOM. Ensure the button IDs are correct.");
-      return;
-    }
-
-    // Update button visibility based on the authentication state
-    if (currentUser) {
-      getStartedBtn.style.display = "none"; // Hide the 'Get Started' button
-      makeRequestBtn.style.display = "inline-block"; // Show the 'Make Request' button
-    } else {
-      getStartedBtn.style.display = "inline-block"; // Show the 'Get Started' button
-      makeRequestBtn.style.display = "none"; // Hide the 'Make Request' button
-    }
+  if (!getStartedBtn || !makeRequestBtn) {
+    console.error("Buttons not found in the DOM. Ensure the button IDs are correct.");
+    return;
   }
+
+  // Update button visibility based on the authentication state
+  if (currentUser) {
+    getStartedBtn.style.display = "none"; // Hide the 'Get Started' button
+    makeRequestBtn.style.display = "inline-block"; // Show the 'Make Request' button
+  } else {
+    getStartedBtn.style.display = "inline-block"; // Show the 'Get Started' button
+    makeRequestBtn.style.display = "none"; // Hide the 'Make Request' button
+  }
+}
 
   // Fetch current session on page load
   (async () => {
@@ -181,14 +174,7 @@ if (!window.supabase) {
         console.log("User is not logged in.");
       }
 
-    // Check if user is logged in via localStorage
-    if (localStorage.getItem('userLoggedIn') === 'true') {
-      currentUser = session.user; // Set current user from session
-      updateButtons(); // Update buttons based on session state
-    } else {
-      updateButtons(); // If not logged in, update the UI accordingly
-    }
-      // updateButtons();
+      updateButtons();
     } catch (err) {
       console.error("Error fetching session:", err.message);
     }
