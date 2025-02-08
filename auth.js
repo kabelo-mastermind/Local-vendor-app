@@ -290,15 +290,15 @@ if (!window.supabase) {
         const { latitude, longitude } = location;
 
         L.marker([latitude, longitude], {
-          icon: L.icon({
-            iconUrl: L.Icon.Default.prototype.options.iconUrl,
-            iconSize: L.Icon.Default.prototype.options.iconSize,
-            iconAnchor: L.Icon.Default.prototype.options.iconAnchor,
-            popupAnchor: L.Icon.Default.prototype.options.popupAnchor,
-            shadowUrl: L.Icon.Default.prototype.options.shadowUrl,
-            shadowSize: L.Icon.Default.prototype.options.shadowSize,
-            shadowAnchor: L.Icon.Default.prototype.options.shadowAnchor,
-          }),
+          // icon: L.icon({
+          //   iconUrl: L.Icon.Default.prototype.options.iconUrl,
+          //   iconSize: L.Icon.Default.prototype.options.iconSize,
+          //   iconAnchor: L.Icon.Default.prototype.options.iconAnchor,
+          //   popupAnchor: L.Icon.Default.prototype.options.popupAnchor,
+          //   shadowUrl: L.Icon.Default.prototype.options.shadowUrl,
+          //   shadowSize: L.Icon.Default.prototype.options.shadowSize,
+          //   shadowAnchor: L.Icon.Default.prototype.options.shadowAnchor,
+          // }),
         })
           .addTo(map)
           .bindPopup("<b>Location</b>");        
