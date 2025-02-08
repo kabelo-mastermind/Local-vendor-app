@@ -185,72 +185,60 @@ if (!window.supabase) {
   const makeRequestBtn = document.getElementById("makeRequestBtn");
   makeRequestBtn.addEventListener("click", async () => {
     if (!currentUser) {
-      alert("Reload the page or loggin by pressing get started to make request");
+      alert("Reload the page or log in by pressing 'Get Started' to make a request.");
       return;
     }
-
+  
     // Check if geolocation is available
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-
+  
           console.log("Current Location:", latitude, longitude);
           // Update map view to the current location
           map.setView([latitude, longitude], 13); // Update map center to user's location
+  
           try {
             // Check if a location already exists for the current user
             const { data: existingLocation, error: fetchError } = await supabase
               .from("current_locations")
               .select("*")
               .eq("user_id", currentUser.id)
-              .single();  // We expect a single entry (if exists)
-
+              .maybeSingle(); // Prevents an error when no record is found
+  
             if (fetchError) {
               console.error("Error fetching existing location:", fetchError.message);
+              alert("Failed to check existing request.");
+              return;
+            }
+  
+            // If a location exists, notify the user and return
+            if (existingLocation) {
               alert("Location already requested.");
               return;
             }
-
-            // If a location exists, update it, otherwise, insert new data
+  
+            // Insert new location since no existing record was found
             const locationData = {
               user_id: currentUser.id,
               latitude,
               longitude,
             };
-
-            let result;
-
-            if (existingLocation) {
-              // Update existing location if found
-              const { data, error } = await supabase
-                .from("current_locations")
-                .update(locationData)
-                .eq("user_id", currentUser.id);
-
-              result = data;
-              if (error) {
-                console.error("Error updating location:", error.message);
-                alert("Failed to update your location. Please try again.");
-                return;
-              }
-            } else {
-              // Insert new location if none exists
-              const { data, error } = await supabase
-                .from("current_locations")
-                .upsert([locationData]);
-
-              result = data;
-              if (error) {
-                console.error("Error saving location:", error.message);
-                alert("Failed to save your location. Please try again.");
-                return;
-              }
+  
+            const { data, error } = await supabase
+              .from("current_locations")
+              .insert([locationData]); // Use insert() instead of upsert() to avoid updating existing records
+  
+            if (error) {
+              console.error("Error saving location:", error.message);
+              alert("Failed to save your location. Please try again.");
+              return;
             }
-
-            console.log("Location saved/updated:", result);
-            alert("Your location has been saved/updated successfully.");
-
+  
+            console.log("Location saved:", data);
+            alert("Your location has been saved successfully.");
+  
             // After saving the location, fetch the coordinates and plot them
             fetchAndPlotLocations();
           } catch (err) {
@@ -267,6 +255,7 @@ if (!window.supabase) {
       alert("Geolocation is not available on your device.");
     }
   });
+  
 
 
   // Fetch and plot coordinates for all users
