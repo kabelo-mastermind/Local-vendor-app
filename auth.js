@@ -288,21 +288,13 @@ if (!window.supabase) {
       // Plot all locations on the map
       locations.forEach((location) => {
         const { latitude, longitude } = location;
-
-        L.marker([latitude, longitude], {
-          // icon: L.icon({
-          //   iconUrl: L.Icon.Default.prototype.options.iconUrl,
-          //   iconSize: L.Icon.Default.prototype.options.iconSize,
-          //   iconAnchor: L.Icon.Default.prototype.options.iconAnchor,
-          //   popupAnchor: L.Icon.Default.prototype.options.popupAnchor,
-          //   shadowUrl: L.Icon.Default.prototype.options.shadowUrl,
-          //   shadowSize: L.Icon.Default.prototype.options.shadowSize,
-          //   shadowAnchor: L.Icon.Default.prototype.options.shadowAnchor,
-          // }),
-        })
+      
+        // Create a marker with a popup
+        L.marker([latitude, longitude])
           .addTo(map)
-          .bindPopup("<b>Location</b>");        
-      });
+          .bindPopup('A pretty CSS popup.<br> Easily customizable.')
+          .openPopup();  // Optionally, you can remove this if you don't want the popup to open immediately
+      });      
     } catch (err) {
       console.error("Error fetching locations:", err.message);
       alert("An error occurred while fetching locations.");
