@@ -285,16 +285,16 @@ if (!window.supabase) {
         }
       });
 
-      // Plot all locations on the map
       locations.forEach((location) => {
         const { latitude, longitude } = location;
       
-        // Create a marker with a popup
+        // Create a default marker and add it to the map
         L.marker([latitude, longitude])
           .addTo(map)
           .bindPopup('A pretty CSS popup.<br> Easily customizable.')
-          .openPopup();  // Optionally, you can remove this if you don't want the popup to open immediately
-      });      
+          .openPopup();  // Optional, removes this if you don't want the popup to open immediately
+      });
+            
     } catch (err) {
       console.error("Error fetching locations:", err.message);
       alert("An error occurred while fetching locations.");
