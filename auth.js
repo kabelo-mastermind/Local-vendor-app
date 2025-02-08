@@ -316,37 +316,42 @@ if (!window.supabase) {
       alert("An error occurred while fetching locations.");
     }
   }
-// Event listener for "Stop Request" button
-const stopRequestBtn = document.getElementById("stopRequestBtn");
 
-stopRequestBtn.addEventListener("click", async () => {
-  if (!currentUser) {
-    alert("You must be logged in to stop your request.");
-    return;
-  }
+  const stopRequestBtn = document.getElementById("stopRequestBtn");
 
-  try {
-    // Delete user's current location record
-    const { error } = await supabase
-      .from("current_locations")
-      .delete()
-      .eq("user_id", currentUser.id);
+if (stopRequestBtn) {
+  stopRequestBtn.addEventListener("click", deleteRequest);
+}
 
-    if (error) {
-      console.error("Error deleting location:", error.message);
-      alert("Failed to remove your request. Please try again.");
+  async function deleteRequest() {
+    if (!currentUser) {
+      alert("You must be logged in to stop your request.");
       return;
     }
-
-    alert("Your request has been successfully removed.");
-    
-    // Optionally, remove the marker from the map
-    fetchAndPlotLocations();
-  } catch (err) {
-    console.error("Error stopping request:", err.message);
-    alert("An error occurred while stopping your request.");
+  
+    try {
+      const { error } = await supabase
+        .from("current_locations")
+        .delete()
+        .eq("user_id", currentUser.id);
+  
+      if (error) {
+        console.error("Error deleting request:", error.message);
+        alert("Failed to remove your request. Please try again.");
+        return;
+      }
+  
+      alert("Your request has been successfully removed.");
+      
+      // Refresh the map to remove the marker
+      fetchAndPlotLocations();
+    } catch (err) {
+      console.error("Error stopping request:", err.message);
+      alert("An error occurred while stopping your request.");
+    }
   }
-});
+  
+  
 
 
   // Initialize the map
