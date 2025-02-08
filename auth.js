@@ -302,14 +302,17 @@ if (!window.supabase) {
 
         L.marker([latitude, longitude], {
           icon: L.icon({
-            iconUrl: "./assets/markers/customer.jpg",
-            iconSize: [30, 38],
-            iconAnchor: [15, 50],
-            popupAnchor: [0, -50],
+            iconUrl: L.Icon.Default.prototype.options.iconUrl,
+            iconSize: L.Icon.Default.prototype.options.iconSize,
+            iconAnchor: L.Icon.Default.prototype.options.iconAnchor,
+            popupAnchor: L.Icon.Default.prototype.options.popupAnchor,
+            shadowUrl: L.Icon.Default.prototype.options.shadowUrl,
+            shadowSize: L.Icon.Default.prototype.options.shadowSize,
+            shadowAnchor: L.Icon.Default.prototype.options.shadowAnchor,
           }),
         })
           .addTo(map)
-          .bindPopup("<b>Location</b>");
+          .bindPopup("<b>Location</b>");        
       });
     } catch (err) {
       console.error("Error fetching locations:", err.message);
