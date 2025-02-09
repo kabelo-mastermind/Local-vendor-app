@@ -488,6 +488,58 @@ async function saveSelectedProducts(selectedProducts) {
 
 
 
+// document.addEventListener("DOMContentLoaded", () => {
+  const feedbackForm = document.getElementById("feedbackForm");
+  const feedbackSuccessMessage = document.getElementById("feedbackSuccessMessage");
+
+  feedbackForm.addEventListener("submit", async (event) => {
+    event.preventDefault(); // Prevent page refresh
+
+    if (!currentUser) {
+      alert("Please log in to submit feedback.");
+      return;
+    }
+
+    const feedbackMessage = document.getElementById("feedbackMessage").value.trim();
+
+    if (!feedbackMessage) {
+      alert("Please enter your feedback before submitting.");
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from("feedback")
+        .insert([
+          {
+            user_id: currentUser.id, // Assuming currentUser contains the logged-in user's ID
+            message: feedbackMessage,
+          },
+        ]);
+
+      if (error) {
+        console.error("Error submitting feedback:", error.message);
+        alert("Failed to submit feedback. Please try again.");
+        return;
+      }
+
+      console.log("Feedback submitted successfully:", data);
+      feedbackSuccessMessage.style.display = "block"; // Show success message
+      feedbackForm.reset(); // Clear the form after submission
+
+      // Close modal automatically after 2 seconds
+      setTimeout(() => {
+        feedbackSuccessMessage.style.display = "none";
+        document.getElementById("feedbackModal").style.display = "none";
+      }, 2000);
+      
+    } catch (err) {
+      console.error("Error submitting feedback:", err.message);
+      alert("An unexpected error occurred. Please try again.");
+    }
+  });
+// });
+
 
   // Initialize the map
   const map = L.map("map").setView([-25.5416, 28.0992], 13); // Default view
