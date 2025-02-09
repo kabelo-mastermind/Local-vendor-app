@@ -347,14 +347,13 @@ if (!window.supabase) {
 
 
   // Select all product cards
- document.addEventListener("DOMContentLoaded", () => {
-    // Select all product cards
+  document.addEventListener("DOMContentLoaded", () => {
     const productCards = document.querySelectorAll('.blog-card');
     let selectedProducts = new Set(); // Store selected product names
 
     // Event listener for product cards
     productCards.forEach(card => {
-        card.addEventListener('click', () => {
+        card.addEventListener('click', async () => {
             const productName = card.getAttribute('data-product-name');
 
             if (selectedProducts.has(productName)) {
@@ -368,9 +367,33 @@ if (!window.supabase) {
             }
 
             console.log('Selected Products:', Array.from(selectedProducts)); // Log all selected products
+
+            // Save selected products in Supabase
+            await saveSelectedProducts(Array.from(selectedProducts));
         });
     });
 });
+
+// Function to insert/update selected products in Supabase
+async function saveSelectedProducts(selectedProducts) {
+    try {
+        const { data, error } = await supabase
+            .from('products') // Replace with your actual table name
+            .upsert(selectedProducts.map(product => ({
+                name: product, // Assuming 'name' is the column for product names
+                selected: true, // Add a column in your table to track selection
+            })));
+
+        if (error) {
+            console.error("Error saving selected products:", error.message);
+        } else {
+            console.log("Products successfully saved:", data);
+        }
+    } catch (err) {
+        console.error("Error:", err.message);
+    }
+}
+
 
 
 
