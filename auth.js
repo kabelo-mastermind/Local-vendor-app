@@ -189,12 +189,6 @@ if (!window.supabase) {
       return;
     }
   
-    // Ensure a product is selected
-    if (!selectedProductName) {
-      alert("Please select a product before making a request.");
-      return;
-    }
-  
     // Check if geolocation is available
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -244,25 +238,6 @@ if (!window.supabase) {
   
             console.log("Location saved:", data);
             alert("Your location has been saved successfully.");
-  
-            // Save the selected product to the database
-            const productData = {
-              user_id: currentUser.id,
-              name: selectedProductName,
-            };
-  
-            const { productDataResponse, productError } = await supabase
-              .from("products")
-              .insert([productData]); // Insert selected product into 'products' table
-  
-            if (productError) {
-              console.error("Error saving product:", productError.message);
-              alert("Failed to save the product. Please try again.");
-              return;
-            }
-  
-            console.log("Product saved:", productDataResponse);
-            alert(`Your request has been made for ${selectedProductName}.`);
   
             // After saving the location, fetch the coordinates and plot them
             fetchAndPlotLocations();
@@ -362,17 +337,25 @@ if (stopRequestBtn) {
   
   
 // Select all product cards
-const productCards = document.querySelectorAll('.blog-card');
-let selectedProductName = null;
+document.addEventListener("DOMContentLoaded", () => {
+  // Select all product cards
+  const productCards = document.querySelectorAll('.blog-card');
+  let selectedProductName = null;
 
-// Event listener for product cards
-productCards.forEach(card => {
-    card.addEventListener('click', () => {
-        // Store the clicked product name
-        selectedProductName = card.getAttribute('data-product-name');
-        console.log('Selected Product:', selectedProductName);
-    });
+  // Event listener for product cards
+  productCards.forEach(card => {
+      card.addEventListener('click', () => {
+          // Store the clicked product name
+          selectedProductName = card.getAttribute('data-product-name');
+          console.log('Selected Product:', selectedProductName);
+
+          // Toggle 'selected' class for visual indication
+          productCards.forEach(c => c.classList.remove('selected')); // Remove from others
+          card.classList.add('selected'); // Add to clicked one
+      });
+  });
 });
+
 
   // Initialize the map
   const map = L.map("map").setView([-25.5416, 28.0992], 13); // Default view

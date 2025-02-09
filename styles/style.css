@@ -69,6 +69,28 @@ body {
     font-weight: bold;
     color: #27ae60;
 }
+/* more blog card */
+.blog-card.selected {
+    border: 3px solid green; /* Highlight the selected card */
+    position: relative;
+}
+
+.blog-card.selected::after {
+    content: '✔';
+    color: white;
+    background-color: green;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 14px;
+}
+
 
 /* Modal Styles */
 .modal {
