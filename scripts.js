@@ -73,7 +73,7 @@
             });
         }
 
-    });
+    // });
     const menuIcon = document.querySelector(".menu-icon");
     const navLinks = document.querySelector(".nav-links");
     
@@ -81,3 +81,42 @@
         navLinks.classList.toggle("active");
     });
     
+
+     const feedbackModal = document.getElementById("feedbackModal");
+    const openFeedbackBtn = document.getElementById("openFeedback");
+    const closeFeedbackBtn = document.querySelector("#feedbackModal .close-btn");
+    const feedbackForm = document.getElementById("feedbackForm");
+    const feedbackSuccessMessage = document.getElementById("feedbackSuccessMessage");
+
+    // Open feedback modal
+    openFeedbackBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        feedbackModal.style.display = "block";
+    });
+
+    // Close feedback modal
+    closeFeedbackBtn.addEventListener("click", () => {
+        feedbackModal.style.display = "none";
+    });
+
+    // Handle feedback submission
+    feedbackForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const feedbackMessage = document.getElementById("feedbackMessage").value;
+        
+        if (feedbackMessage.trim() !== "") {
+            feedbackSuccessMessage.style.display = "block";
+            setTimeout(() => {
+                feedbackModal.style.display = "none";
+                feedbackSuccessMessage.style.display = "none";
+                feedbackForm.reset();
+            }, 2000);
+        }
+    });
+    // Close modal if clicking outside of it
+    window.addEventListener("click", (e) => {
+        if (e.target === feedbackModal) {
+            feedbackModal.style.display = "none";
+        }
+    });
+});
