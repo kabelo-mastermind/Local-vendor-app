@@ -257,59 +257,79 @@ if (!window.supabase) {
   });
 
 
-
-  // Fetch and plot coordinates for all users
   // Fetch and plot coordinates for all users only if the user is logged in
   async function fetchAndPlotLocations() {
     if (!currentUser) {
-      // alert("Press get started, Sign in and refresh page then request");
-      return; // Exit the function if no user is logged in
+        return; // Exit if no user is logged in
     }
 
     try {
-      // Fetch all locations from the current_locations table
-      const { data: locations, error } = await supabase
-        .from("current_locations")
-        .select("latitude, longitude");
+        // ✅ Fetch locations from the current_locations table
+        const { data: locations, error: locationError } = await supabase
+            .from("current_locations")
+            .select("latitude, longitude, user_id"); // Include user_id to link products
 
-      if (error) {
-        console.error("Error fetching locations:", error.message);
-        alert("Failed to load locations.");
-        return;
-      }
-
-      // Clear existing markers before plotting new ones
-      map.eachLayer((layer) => {
-        if (layer instanceof L.Marker) {
-          map.removeLayer(layer);
+        if (locationError) {
+            console.error("Error fetching locations:", locationError.message);
+            alert("Failed to load locations.");
+            return;
         }
-      });
 
-      // Define a custom Leaflet icon
-      const customIcon = L.icon({
-        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', // Leaflet's default marker from CDN
-        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-      });
+        // ✅ Fetch selected products for all users from the products table
+        const { data: products, error: productError } = await supabase
+            .from("products")
+            .select("name, user_id")
+            .eq("selected", true); // Only fetch selected products
 
-      // Loop through locations and add markers with the custom icon
-      locations.forEach((location) => {
-        const { latitude, longitude } = location;
+        if (productError) {
+            console.error("Error fetching products:", productError.message);
+            return;
+        }
 
-        L.marker([latitude, longitude], { icon: customIcon })  // Use the custom icon
-          .addTo(map)
-          .bindPopup('A pretty CSS popup.<br> Easily customizable.');
-      });
+        // ✅ Clear existing markers before plotting new ones
+        map.eachLayer((layer) => {
+            if (layer instanceof L.Marker) {
+                map.removeLayer(layer);
+            }
+        });
 
+        // ✅ Define a custom Leaflet icon
+        const customIcon = L.icon({
+            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+        });
+
+        // ✅ Loop through locations and add markers with associated products
+        locations.forEach((location) => {
+            const { latitude, longitude, user_id } = location;
+
+            // Find products for this user
+            const userProducts = products
+                .filter(product => product.user_id === user_id)
+                .map(product => product.name)
+                .join(", "); // Convert array to comma-separated string
+
+            // ✅ Create popup content with product names
+            const popupContent = userProducts.length > 0 
+                ? `<b>Products:</b> ${userProducts}` 
+                : "No products selected.";
+
+            // ✅ Add marker to map with popup content
+            L.marker([latitude, longitude], { icon: customIcon })
+                .addTo(map)
+                .bindPopup(popupContent);
+        });
 
     } catch (err) {
-      console.error("Error fetching locations:", err.message);
-      alert("An error occurred while fetching locations.");
+        console.error("Error fetching locations:", err.message);
+        alert("An error occurred while fetching locations.");
     }
-  }
+}
+
 
   const stopRequestBtn = document.getElementById("stopRequestBtn");
 
