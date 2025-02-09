@@ -402,34 +402,45 @@ if (!window.supabase) {
             if (selectedProducts.has(productName)) {
                 selectedProducts.delete(productName);
                 card.classList.remove('selected');
+
+                // ✅ DELETE the product from Supabase when unselected
+                try {
+                    const { error } = await supabase
+                        .from("products")
+                        .delete()
+                        .eq("name", productName)
+                        .eq("user_id", userId);
+
+                    if (error) throw error;
+
+                    console.log(`Product '${productName}' deleted.`);
+                    location.reload(); // ✅ Refresh the tab after deletion
+
+                } catch (err) {
+                    console.error("Error deleting product:", err.message);
+                }
+
             } else {
                 selectedProducts.add(productName);
                 card.classList.add('selected');
-            }
 
-            console.log('Selected Products:', Array.from(selectedProducts));
+                // ✅ INSERT the selected product into Supabase
+                try {
+                    const { data, error } = await supabase
+                        .from("products")
+                        .upsert([{ name: productName, selected: true, user_id: userId }], { onConflict: ['name', 'user_id'] });
 
-            // ✅ Step 4: Sync selected products with Supabase
-            try {
-                const productEntries = Array.from(selectedProducts).map(name => ({
-                    name,
-                    selected: true,
-                    user_id: userId
-                }));
+                    if (error) throw error;
+                    console.log(`Product '${productName}' saved:`, data);
 
-                const { data, error } = await supabase
-                    .from("products")
-                    .upsert(productEntries, { onConflict: ['name', 'user_id'] });
-
-                if (error) throw error;
-                console.log("Selected products saved:", data);
-
-            } catch (err) {
-                console.error("Error saving selected products:", err.message);
+                } catch (err) {
+                    console.error("Error saving selected product:", err.message);
+                }
             }
         });
     });
 });
+
 
 
 // Function to insert/update selected products in Supabase
