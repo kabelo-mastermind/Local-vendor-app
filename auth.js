@@ -347,32 +347,55 @@ if (!window.supabase) {
 
 
   // Select all product cards
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
     const productCards = document.querySelectorAll('.blog-card');
-    let selectedProducts = new Set(); // Store selected product names
+    let selectedProducts = new Set();
+    
+    // Fetch the current user's session from Supabase Auth
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+        console.error("User not authenticated. Please log in.");
+        return;
+    }
 
-    // Event listener for product cards
+    const userId = user.id; // Ensure user ID is retrieved
+
     productCards.forEach(card => {
         card.addEventListener('click', async () => {
             const productName = card.getAttribute('data-product-name');
 
             if (selectedProducts.has(productName)) {
-                // If already selected, remove from set and remove class
                 selectedProducts.delete(productName);
                 card.classList.remove('selected');
             } else {
-                // Otherwise, add to set and apply class
                 selectedProducts.add(productName);
                 card.classList.add('selected');
             }
 
-            console.log('Selected Products:', Array.from(selectedProducts)); // Log all selected products
+            console.log('Selected Products:', Array.from(selectedProducts));
 
-            // Save selected products in Supabase
-            await saveSelectedProducts(Array.from(selectedProducts));
+            // Convert selected products to an array of objects for Supabase
+            const productEntries = Array.from(selectedProducts).map(name => ({
+                name,
+                selected: true,
+                user_id: userId // Ensure user_id is included
+            }));
+
+            try {
+                const { data, error } = await supabase
+                    .from("products")
+                    .upsert(productEntries, { onConflict: ['name', 'user_id'] });
+
+                if (error) throw error;
+                console.log("Selected products saved:", data);
+            } catch (err) {
+                console.error("Error saving selected products:", err.message);
+            }
         });
     });
 });
+
 
 // Function to insert/update selected products in Supabase
 async function saveSelectedProducts(selectedProducts) {
