@@ -215,7 +215,7 @@ if (!window.supabase) {
 
             // If a location exists, notify the user and return
             if (existingLocation) {
-              alert("Location already requested.");
+              alert("Vegetables successfully requested.");
               location.reload(); // ✅ Refresh the tab after already requested
               return;
             }
@@ -372,6 +372,8 @@ if (!window.supabase) {
 
         // Refresh the map to remove the marker
         fetchAndPlotLocations();
+        location.reload(); // ✅ Refresh the page to remove the products
+
     } catch (err) {
         console.error("Error stopping request:", err.message);
         alert("An error occurred while stopping your request.");
