@@ -347,24 +347,31 @@ if (!window.supabase) {
 
 
   // Select all product cards
-  document.addEventListener("DOMContentLoaded", () => {
+ document.addEventListener("DOMContentLoaded", () => {
     // Select all product cards
     const productCards = document.querySelectorAll('.blog-card');
-    let selectedProductName = null;
+    let selectedProducts = new Set(); // Store selected product names
 
     // Event listener for product cards
     productCards.forEach(card => {
-      card.addEventListener('click', () => {
-        // Store the clicked product name
-        selectedProductName = card.getAttribute('data-product-name');
-        console.log('Selected Product:', selectedProductName);
+        card.addEventListener('click', () => {
+            const productName = card.getAttribute('data-product-name');
 
-        // Toggle 'selected' class for visual indication
-        productCards.forEach(c => c.classList.remove('selected')); // Remove from others
-        card.classList.add('selected'); // Add to clicked one
-      });
+            if (selectedProducts.has(productName)) {
+                // If already selected, remove from set and remove class
+                selectedProducts.delete(productName);
+                card.classList.remove('selected');
+            } else {
+                // Otherwise, add to set and apply class
+                selectedProducts.add(productName);
+                card.classList.add('selected');
+            }
+
+            console.log('Selected Products:', Array.from(selectedProducts)); // Log all selected products
+        });
     });
-  });
+});
+
 
 
   // Initialize the map
