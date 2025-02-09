@@ -216,6 +216,7 @@ if (!window.supabase) {
             // If a location exists, notify the user and return
             if (existingLocation) {
               alert("Location already requested.");
+              location.reload(); // ✅ Refresh the tab after already requested
               return;
             }
 
