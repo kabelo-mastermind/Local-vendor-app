@@ -487,7 +487,6 @@ async function saveSelectedProducts(selectedProducts) {
 }
 
 
-
 // document.addEventListener("DOMContentLoaded", () => {
   const feedbackForm = document.getElementById("feedbackForm");
   const feedbackSuccessMessage = document.getElementById("feedbackSuccessMessage");
@@ -539,6 +538,7 @@ async function saveSelectedProducts(selectedProducts) {
     }
   });
 // });
+
 
 
   // Initialize the map
