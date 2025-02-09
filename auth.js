@@ -316,34 +316,46 @@ if (!window.supabase) {
   if (stopRequestBtn) {
     stopRequestBtn.addEventListener("click", deleteRequest);
   }
-
   async function deleteRequest() {
     if (!currentUser) {
-      alert("You must be logged in to stop your request.");
-      return;
+        alert("You must be logged in to stop your request.");
+        return;
     }
 
     try {
-      const { error } = await supabase
-        .from("current_locations")
-        .delete()
-        .eq("user_id", currentUser.id);
+        // Step 1: Delete associated products first
+        const { error: productError } = await supabase
+            .from("products")
+            .delete()
+            .eq("user_id", currentUser.id);
 
-      if (error) {
-        console.error("Error deleting request:", error.message);
-        alert("Failed to remove your request. Please try again.");
-        return;
-      }
+        if (productError) {
+            console.error("Error deleting products:", productError.message);
+            alert("Failed to remove selected products. Please try again.");
+            return;
+        }
 
-      alert("Your request has been successfully removed.");
+        // Step 2: Delete the location after products are removed
+        const { error: locationError } = await supabase
+            .from("current_locations")
+            .delete()
+            .eq("user_id", currentUser.id);
 
-      // Refresh the map to remove the marker
-      fetchAndPlotLocations();
+        if (locationError) {
+            console.error("Error deleting request:", locationError.message);
+            alert("Failed to remove your request. Please try again.");
+            return;
+        }
+
+        alert("Your request and selected products have been successfully removed.");
+
+        // Refresh the map to remove the marker
+        fetchAndPlotLocations();
     } catch (err) {
-      console.error("Error stopping request:", err.message);
-      alert("An error occurred while stopping your request.");
+        console.error("Error stopping request:", err.message);
+        alert("An error occurred while stopping your request.");
     }
-  }
+}
 
 
   // Select all product cards
@@ -359,8 +371,30 @@ if (!window.supabase) {
         return;
     }
 
-    const userId = user.id; // Ensure user ID is retrieved
+    const userId = user.id;
 
+    // ✅ Step 1: Fetch previously selected products from Supabase
+    try {
+        const { data: existingProducts, error } = await supabase
+            .from("products")
+            .select("name")
+            .eq("user_id", userId)
+            .eq("selected", true); // Only get selected products
+
+        if (error) throw error;
+
+        // ✅ Step 2: Mark them as selected in the UI
+        existingProducts.forEach(({ name }) => {
+            selectedProducts.add(name);
+            const card = document.querySelector(`[data-product-name="${name}"]`);
+            if (card) card.classList.add('selected');
+        });
+
+    } catch (err) {
+        console.error("Error fetching selected products:", err.message);
+    }
+
+    // ✅ Step 3: Add event listeners for product selection
     productCards.forEach(card => {
         card.addEventListener('click', async () => {
             const productName = card.getAttribute('data-product-name');
@@ -375,20 +409,21 @@ if (!window.supabase) {
 
             console.log('Selected Products:', Array.from(selectedProducts));
 
-            // Convert selected products to an array of objects for Supabase
-            const productEntries = Array.from(selectedProducts).map(name => ({
-                name,
-                selected: true,
-                user_id: userId // Ensure user_id is included
-            }));
-
+            // ✅ Step 4: Sync selected products with Supabase
             try {
+                const productEntries = Array.from(selectedProducts).map(name => ({
+                    name,
+                    selected: true,
+                    user_id: userId
+                }));
+
                 const { data, error } = await supabase
                     .from("products")
                     .upsert(productEntries, { onConflict: ['name', 'user_id'] });
 
                 if (error) throw error;
                 console.log("Selected products saved:", data);
+
             } catch (err) {
                 console.error("Error saving selected products:", err.message);
             }
