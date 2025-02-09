@@ -185,7 +185,7 @@ if (!window.supabase) {
   const makeRequestBtn = document.getElementById("makeRequestBtn");
   makeRequestBtn.addEventListener("click", async () => {
     if (!currentUser) {
-      alert("Reload the page or log in by pressing 'Get Started' to make a request.");
+      alert("Reload the page or log in by pressing 'Get Started' to start making requests.");
       return;
     }
 
@@ -215,7 +215,7 @@ if (!window.supabase) {
 
             // If a location exists, notify the user and return
             if (existingLocation) {
-              alert("Vegetables successfully requested.");
+              alert("products added to cart.");
               location.reload(); // ✅ Refresh the tab after already requested
               return;
             }
@@ -238,7 +238,7 @@ if (!window.supabase) {
             }
 
             console.log("Location saved:", data);
-            alert("Your location has been saved successfully.");
+            alert("Your request was made successfully.");
 
             // After saving the location, fetch the coordinates and plot them
             fetchAndPlotLocations();
