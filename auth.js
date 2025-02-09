@@ -188,17 +188,17 @@ if (!window.supabase) {
       alert("Reload the page or log in by pressing 'Get Started' to make a request.");
       return;
     }
-  
+
     // Check if geolocation is available
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
-  
+
           console.log("Current Location:", latitude, longitude);
           // Update map view to the current location
           map.setView([latitude, longitude], 13); // Update map center to user's location
-  
+
           try {
             // Check if a location already exists for the current user
             const { data: existingLocation, error: fetchError } = await supabase
@@ -206,39 +206,39 @@ if (!window.supabase) {
               .select("*")
               .eq("user_id", currentUser.id)
               .maybeSingle(); // Prevents an error when no record is found
-  
+
             if (fetchError) {
               console.error("Error fetching existing location:", fetchError.message);
               alert("Failed to check existing request.");
               return;
             }
-  
+
             // If a location exists, notify the user and return
             if (existingLocation) {
               alert("Location already requested.");
               return;
             }
-  
+
             // Insert new location since no existing record was found
             const locationData = {
               user_id: currentUser.id,
               latitude,
               longitude,
             };
-  
+
             const { data, error } = await supabase
               .from("current_locations")
               .insert([locationData]); // Use insert() instead of upsert() to avoid updating existing records
-  
+
             if (error) {
               console.error("Error saving location:", error.message);
               alert("Failed to save your location. Please try again.");
               return;
             }
-  
+
             console.log("Location saved:", data);
             alert("Your location has been saved successfully.");
-  
+
             // After saving the location, fetch the coordinates and plot them
             fetchAndPlotLocations();
           } catch (err) {
@@ -255,7 +255,7 @@ if (!window.supabase) {
       alert("Geolocation is not available on your device.");
     }
   });
-  
+
 
 
   // Fetch and plot coordinates for all users
@@ -285,16 +285,26 @@ if (!window.supabase) {
         }
       });
 
+      // Define a custom Leaflet icon
+      const customIcon = L.icon({
+        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png', // Leaflet's default marker from CDN
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      });
+
+      // Loop through locations and add markers with the custom icon
       locations.forEach((location) => {
         const { latitude, longitude } = location;
-      
-        // Create a default marker and add it to the map
-        L.marker([latitude, longitude])
+
+        L.marker([latitude, longitude], { icon: customIcon })  // Use the custom icon
           .addTo(map)
-          .bindPopup('A pretty CSS popup.<br> Easily customizable.')
-          .openPopup();  // Optional, removes this if you don't want the popup to open immediately
+          .bindPopup('A pretty CSS popup.<br> Easily customizable.');
       });
-            
+
+
     } catch (err) {
       console.error("Error fetching locations:", err.message);
       alert("An error occurred while fetching locations.");
@@ -303,30 +313,30 @@ if (!window.supabase) {
 
   const stopRequestBtn = document.getElementById("stopRequestBtn");
 
-if (stopRequestBtn) {
-  stopRequestBtn.addEventListener("click", deleteRequest);
-}
+  if (stopRequestBtn) {
+    stopRequestBtn.addEventListener("click", deleteRequest);
+  }
 
   async function deleteRequest() {
     if (!currentUser) {
       alert("You must be logged in to stop your request.");
       return;
     }
-  
+
     try {
       const { error } = await supabase
         .from("current_locations")
         .delete()
         .eq("user_id", currentUser.id);
-  
+
       if (error) {
         console.error("Error deleting request:", error.message);
         alert("Failed to remove your request. Please try again.");
         return;
       }
-  
+
       alert("Your request has been successfully removed.");
-      
+
       // Refresh the map to remove the marker
       fetchAndPlotLocations();
     } catch (err) {
@@ -334,27 +344,27 @@ if (stopRequestBtn) {
       alert("An error occurred while stopping your request.");
     }
   }
-  
-  
-// Select all product cards
-document.addEventListener("DOMContentLoaded", () => {
+
+
   // Select all product cards
-  const productCards = document.querySelectorAll('.blog-card');
-  let selectedProductName = null;
+  document.addEventListener("DOMContentLoaded", () => {
+    // Select all product cards
+    const productCards = document.querySelectorAll('.blog-card');
+    let selectedProductName = null;
 
-  // Event listener for product cards
-  productCards.forEach(card => {
+    // Event listener for product cards
+    productCards.forEach(card => {
       card.addEventListener('click', () => {
-          // Store the clicked product name
-          selectedProductName = card.getAttribute('data-product-name');
-          console.log('Selected Product:', selectedProductName);
+        // Store the clicked product name
+        selectedProductName = card.getAttribute('data-product-name');
+        console.log('Selected Product:', selectedProductName);
 
-          // Toggle 'selected' class for visual indication
-          productCards.forEach(c => c.classList.remove('selected')); // Remove from others
-          card.classList.add('selected'); // Add to clicked one
+        // Toggle 'selected' class for visual indication
+        productCards.forEach(c => c.classList.remove('selected')); // Remove from others
+        card.classList.add('selected'); // Add to clicked one
       });
+    });
   });
-});
 
 
   // Initialize the map
