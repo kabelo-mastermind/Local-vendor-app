@@ -283,7 +283,6 @@ signupForm.addEventListener("submit", async (e) => {
 
 
 // ✅ Fetch and plot all user locations and products
-
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     // Fetch the logged-in user's session
@@ -298,7 +297,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("User logged in:", session.user.email); // Debugging log
 
     // Only fetch and plot locations if the user is authenticated
-    await fetchAndPlotLocations(session.user.id);  // Pass user ID if needed for custom logic
+    await fetchAndPlotLocations();  // No need to pass user ID anymore
 
   } catch (err) {
     console.error("Error in session check:", err.message);
@@ -306,8 +305,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-// ✅ Fetch and plot all user locations and products (only for logged-in users)
-async function fetchAndPlotLocations(userId) {
+// ✅ Fetch and plot all user locations and products (all users, not just the current user)
+async function fetchAndPlotLocations() {
   try {
       // ✅ Fetch locations from 'current_locations' table
       const { data: locations, error: locationError } = await supabase
@@ -348,12 +347,9 @@ async function fetchAndPlotLocations(userId) {
           shadowSize: [41, 41]
       });
 
-      // ✅ Loop through locations and add markers
+      // ✅ Loop through locations and add markers for all users
       locations.forEach((location) => {
           const { latitude, longitude, user_id } = location;
-
-          // Only process the current user's locations
-          if (user_id !== userId) return;
 
           // Find all products for this user
           const userProducts = products
@@ -366,7 +362,7 @@ async function fetchAndPlotLocations(userId) {
               ? `<b>Products:</b> ${userProducts}` 
               : "No products requested.";
 
-          // ✅ Add marker to the map
+          // ✅ Add marker to the map for all users
           L.marker([latitude, longitude], { icon: customIcon })
               .addTo(map)
               .bindPopup(popupContent);
