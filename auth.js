@@ -283,23 +283,31 @@ signupForm.addEventListener("submit", async (e) => {
 
 
 // ✅ Fetch and plot all user locations and products
+
 document.addEventListener("DOMContentLoaded", async () => {
-  // Fetch the logged-in user's session
-  const { data: { session }, error } = await supabase.auth.getSession();
+  try {
+    // Fetch the logged-in user's session
+    const { data: { session }, error } = await supabase.auth.getSession();
 
-  if (error || !session || !session.user) {
-    console.error("User not authenticated. Please log in.");
-    return; // Exit if no user is logged in
+    if (error || !session || !session.user) {
+      console.error("User not authenticated. Please log in.");
+      alert("User not authenticated. Please log in.");
+      return; // Exit if no user is logged in
+    }
+
+    console.log("User logged in:", session.user.email); // Debugging log
+
+    // Only fetch and plot locations if the user is authenticated
+    await fetchAndPlotLocations(session.user.id);  // Pass user ID if needed for custom logic
+
+  } catch (err) {
+    console.error("Error in session check:", err.message);
+    alert("An error occurred while checking the session.");
   }
-
-  console.log("User logged in:", session.user.email); // Debugging log
-
-  // Only fetch and plot locations if the user is authenticated
-  fetchAndPlotLocations();
 });
 
 // ✅ Fetch and plot all user locations and products (only for logged-in users)
-async function fetchAndPlotLocations() {
+async function fetchAndPlotLocations(userId) {
   try {
       // ✅ Fetch locations from 'current_locations' table
       const { data: locations, error: locationError } = await supabase
@@ -344,6 +352,9 @@ async function fetchAndPlotLocations() {
       locations.forEach((location) => {
           const { latitude, longitude, user_id } = location;
 
+          // Only process the current user's locations
+          if (user_id !== userId) return;
+
           // Find all products for this user
           const userProducts = products
               .filter(product => product.user_id === user_id)
@@ -366,6 +377,7 @@ async function fetchAndPlotLocations() {
       alert("An error occurred while fetching locations.");
   }
 }
+
 
 
   const stopRequestBtn = document.getElementById("stopRequestBtn");
