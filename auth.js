@@ -300,29 +300,71 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // ✅ Fetch and plot all user locations and products (only for logged-in users)
 async function fetchAndPlotLocations() {
-  // Ensure user is authenticated before fetching locations
-  const { data: { session } } = await supabase.auth.getSession();
-  
-  if (!session || !session.user) {
-    console.error("Access denied: User not logged in.");
-    return;
+  try {
+      // ✅ Fetch locations from 'current_locations' table
+      const { data: locations, error: locationError } = await supabase
+          .from("current_locations")
+          .select("latitude, longitude, user_id"); // Fetch all users' locations
+
+      if (locationError) {
+          console.error("Error fetching locations:", locationError.message);
+          alert("Failed to load locations.");
+          return;
+      }
+
+      // ✅ Fetch selected products for all users from 'products' table
+      const { data: products, error: productError } = await supabase
+          .from("products")
+          .select("name, user_id")
+          .eq("selected", true); // Only fetch selected products
+
+      if (productError) {
+          console.error("Error fetching products:", productError.message);
+          return;
+      }
+
+      // ✅ Clear existing markers before adding new ones
+      map.eachLayer((layer) => {
+          if (layer instanceof L.Marker) {
+              map.removeLayer(layer);
+          }
+      });
+
+      // ✅ Custom Leaflet marker icon
+      const customIcon = L.icon({
+          iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+          shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41]
+      });
+
+      // ✅ Loop through locations and add markers
+      locations.forEach((location) => {
+          const { latitude, longitude, user_id } = location;
+
+          // Find all products for this user
+          const userProducts = products
+              .filter(product => product.user_id === user_id)
+              .map(product => product.name)
+              .join(", "); // Convert array to comma-separated string
+
+          // ✅ Popup content
+          const popupContent = userProducts.length > 0 
+              ? `<b>Products:</b> ${userProducts}` 
+              : "No products requested.";
+
+          // ✅ Add marker to the map
+          L.marker([latitude, longitude], { icon: customIcon })
+              .addTo(map)
+              .bindPopup(popupContent);
+      });
+
+  } catch (err) {
+      console.error("Error fetching locations:", err.message);
+      alert("An error occurred while fetching locations.");
   }
-
-  console.log("Fetching markers for logged-in user:", session.user.id);
-
-  const { data, error } = await supabase.from("current_locations").select("*");
-
-  if (error) {
-    console.error("Error fetching locations:", error.message);
-    return;
-  }
-
-  console.log("Fetched locations:", data);
-
-  data.forEach((location) => {
-    const marker = L.marker([location.latitude, location.longitude]).addTo(map);
-    marker.bindPopup(`User requested at: ${location.latitude}, ${location.longitude}`).openPopup();
-  });
 }
 
 
