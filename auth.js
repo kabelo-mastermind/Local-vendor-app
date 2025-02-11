@@ -75,6 +75,7 @@ if (!window.supabase) {
       if (error) throw new Error(error.message);
 
       alert("Sign-up successful! Please check your email to confirm your account.");
+      saveUserData();
     } catch (err) {
       console.error("Sign-up error:", err.message);
       alert(err.message);
@@ -112,7 +113,25 @@ if (!window.supabase) {
     }
   });
 
+  const resetPasswordForm = document.getElementById("resetPasswordForm");
 
+  resetPasswordForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    
+    const email = document.getElementById("resetEmail").value;
+  
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+  
+      if (error) throw new Error(error.message);
+  
+      alert("A password reset link has been sent to your email.");
+    } catch (err) {
+      console.error("Reset password error:", err.message);
+      alert(err.message);
+    }
+  });
+  
   // Sign-out handler
   const signoutBtn = document.getElementById("sign-out");
   signoutBtn.addEventListener("click", async () => {
@@ -132,7 +151,7 @@ if (!window.supabase) {
       alert("Signed out successfully!");
 
       // Optionally, redirect to another page after sign-out
-      window.location.href = "https://zambane.netlify.app/"; // Redirect after sign-out (you can change the URL)
+      window.location.href = "https://zambane.co.za/"; // Redirect after sign-out (you can change the URL)
     } catch (err) {
       console.error("Sign-out error:", err.message);
       alert(err.message);

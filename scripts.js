@@ -103,5 +103,35 @@
             feedbackModal.style.display = "none";
           }
         });
+        
       });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const resetPasswordModal = document.getElementById("resetPasswordModal");
+        const openResetBtn = document.getElementById("openResetPassword");
+        const closeResetBtn = document.getElementById("closeResetModal");
+        const resetPasswordForm = document.getElementById("resetPasswordForm");
+        const resetSuccessMessage = document.getElementById("resetSuccessMessage");
+    
+        // Open reset password modal
+        openResetBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            resetPasswordModal.style.display = "block";
+        });
+    
+        // Close reset password modal
+        closeResetBtn.addEventListener("click", () => {
+            resetPasswordModal.style.display = "none";
+        });
+    
+        // Close modal if clicking outside of it
+        window.addEventListener("click", (e) => {
+            if (e.target === resetPasswordModal) {
+                resetPasswordModal.style.display = "none";
+            }
+        });
+    
+     
+    });
+    
       

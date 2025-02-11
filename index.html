@@ -33,11 +33,11 @@
         <nav class="navbar">
             <div class="container">
                 <div class="logo">
-                    <a href="https://zambane.netlify.app/">Zambane</a>
+                    <a href="https://zambane.co.za/">Zambane</a>
                 </div>
                 <div class="nav-links">
                     <ul>
-                        <li><a href="https://zambane.netlify.app/">Home</a></li>
+                        <li><a href="https://zambane.co.za/">Home</a></li>
                         <li><a href="#" id="openMap">Requests</a><span class="notification">1</span></li>
                         <!-- Changed link to trigger scroll -->
                         <li><a  id="sign-out" class="sign-out">Sign out</a></li>
@@ -99,7 +99,7 @@
 
                 <button type="submit" class="btn-primary">Sign In</button>
                 <h3>Don't have an account? <a href="#" id="openSignUp">Sign up now</a></h3>
-                <!-- <h5>Forgot Password?<a href="#" id="openForgotPassword">Change Password</a></h5> -->
+                <h5>Forgot Password?<a href="#" id="ForgotPassword">Change Password</a></h5>
             </form>
         </div>
     </div>
@@ -119,38 +119,22 @@
 </div>
 
 
-<!-- <div id="ForgotPassword" class="modal">
+<!-- Reset Password Modal -->
+<div id="resetPasswordModal" class="modal">
     <div class="modal-content">
-      <span class="close-btn">&times;</span>
-      <h2>Forgot Password</h2>
-      <form id="forgotPasswordForm">
-        <div id="ForgotPasswordMessage" class="messageDiv" ></div>
-        
-        <label for="email">Email:</label>
-        <input type="email" id="ForgotPasswordEmail" name="email" placeholder="Enter your email" required>
-        
-        <button type="submit" class="btn-primary">Send Reset Email</button>
-        
-        <h3>Remembered your password? <a href="#" id="openSignIn">Login now</a></h3>
-      </form>
+        <span class="close-btn" id="closeResetModal">&times;</span>
+        <h2>Reset Your Password</h2>
+        <form id="resetPasswordForm">
+            <label for="resetEmail">Enter your email:</label>
+            <input type="email" id="resetEmail" name="resetEmail" required />
+            <button type="submit" class="btn-primary">Send Reset Link</button>
+        </form>
+        <p id="resetSuccessMessage" style="color: green; display: none;">
+            A password reset link has been sent to your email.
+        </p>
     </div>
-  </div>
- Reset Password Modal 
-<div class="reset-password-container modal" style="display: none;">
-    <div class="modal-content">
-      <span class="close-btn">&times;</span>
-      <h1>Reset Your Password</h1>
-      <form id="resetPasswordForm">
-        <div id="resetMessage" class="message"></div>
-        <label for="password">New Password</label>
-        <input type="password" id="newPassword" placeholder="Enter your new password" required>
-        <label for="confirmPassword">Confirm Password</label>
-        <input type="password" id="confirmPassword" placeholder="Confirm your new password" required>
-        <button type="submit">Reset Password</button>
-      </form>
-    </div>
-  </div>
-   -->
+</div>
+
    
     <!-- Add your styles for the modal -->
 
