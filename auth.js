@@ -328,7 +328,7 @@ async function fetchAndPlotLocations() {
 
     if (locationError) {
         console.error("Error fetching locations:", locationError.message);
-        alert("Failed to load locations.");
+        alert("About to load locations.");
         return;
     }
 
