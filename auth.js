@@ -288,15 +288,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Fetch the logged-in user's session
     const { data: { session }, error } = await supabase.auth.getSession();
 
+    // Check if the user is authenticated
     if (error || !session || !session.user) {
       console.error("User not authenticated. Please log in.");
       alert("User not authenticated. Please log in.");
-      return; // Exit if no user is logged in
+      return; // Exit early if no user is logged in
     }
 
     console.log("User logged in:", session.user.email); // Debugging log
 
-    // Only fetch and plot locations if the user is authenticated
+    // Fetch and plot locations if the user is authenticated
     await fetchAndPlotLocations();  // No need to pass user ID anymore
 
   } catch (err) {
@@ -305,10 +306,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-// ✅ Fetch and plot all user locations and products (all users, not just the current user)
+// ✅ Fetch and plot all user locations and products (only if the user is logged in)
 async function fetchAndPlotLocations() {
   try {
-      // ✅ Fetch locations from 'current_locations' table
+      // ✅ Fetch locations from 'current_locations' table (all users' locations)
       const { data: locations, error: locationError } = await supabase
           .from("current_locations")
           .select("latitude, longitude, user_id"); // Fetch all users' locations
