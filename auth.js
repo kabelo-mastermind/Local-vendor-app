@@ -283,6 +283,22 @@ signupForm.addEventListener("submit", async (e) => {
 
 
 // ✅ Fetch and plot all user locations and products
+document.addEventListener("DOMContentLoaded", async () => {
+  // ✅ Fetch the logged-in user's session
+  const { data: { user }, error } = await supabase.auth.getUser();
+
+  if (error || !user) {
+      console.error("User not authenticated. Please log in.");
+      return; // Exit if no user is logged in
+  }
+
+  console.log("User logged in:", user.email); // Debugging log
+
+  // ✅ Only fetch and plot locations if the user is authenticated
+  fetchAndPlotLocations();
+});
+
+// ✅ Fetch and plot all user locations and products (only for logged-in users)
 async function fetchAndPlotLocations() {
   try {
       // ✅ Fetch locations from 'current_locations' table
@@ -337,7 +353,7 @@ async function fetchAndPlotLocations() {
           // ✅ Popup content
           const popupContent = userProducts.length > 0 
               ? `<b>Products:</b> ${userProducts}` 
-              : "No products selected.";
+              : "No products requested.";
 
           // ✅ Add marker to the map
           L.marker([latitude, longitude], { icon: customIcon })
@@ -350,20 +366,6 @@ async function fetchAndPlotLocations() {
       alert("An error occurred while fetching locations.");
   }
 }
-
-// ✅ Run fetchAndPlotLocations() when page loads
-document.addEventListener("DOMContentLoaded", async () => {
-  // ✅ Fetch the logged-in user's session
-  const { data: { user }, error } = await supabase.auth.getUser();
-
-  if (error || !user) {
-      console.error("User not authenticated. Please log in.");
-      return;
-  }
-
-  // ✅ Load all locations and products for all users
-  fetchAndPlotLocations();
-});
 
 
   const stopRequestBtn = document.getElementById("stopRequestBtn");
