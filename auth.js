@@ -6,14 +6,15 @@ if (!window.supabase) {
   let currentUser = null;
 
   // Utility function to insert or update user data in the 'clients' table
-  const saveUserData = async (user) => {
-    try {
-      const { id, user_metadata, email } = user;
 
+const saveUserData = async (user) => {
+  if (!user) return; // Ensure user is available
+
+  try {
       const userData = {
-        id,
-        name: user_metadata?.name || "Anonymous",
-        email,
+          id: user.id, // Use Supabase User ID as primary key
+          name: user.user_metadata?.name || "Anonymous",
+          email: user.email,
       };
 
       console.log("Saving user data:", userData);
@@ -21,17 +22,17 @@ if (!window.supabase) {
       const { data, error } = await supabase.from("clients").upsert([userData]);
 
       if (error) {
-        console.error("Upsert failed:", error.message);
-        return false;
+          console.error("Upsert failed:", error.message);
+          return false;
       } else {
-        console.log("User saved in 'clients':", data);
-        return true;
+          console.log("User saved in 'clients':", data);
+          return true;
       }
-    } catch (err) {
+  } catch (err) {
       console.error("Error in saveUserData:", err.message);
       return false;
-    }
-  };
+  }
+};
 
   // Listen for authentication state changes
   supabase.auth.onAuthStateChange(async (event, session) => {
@@ -57,8 +58,9 @@ if (!window.supabase) {
 
 
   // Sign-up form handler
-  const signupForm = document.getElementById("signupModal");
-  signupForm.addEventListener("submit", async (e) => {
+
+const signupForm = document.getElementById("signupModal");
+signupForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const name = document.getElementById("name").value;
@@ -66,21 +68,24 @@ if (!window.supabase) {
     const password = document.getElementById("password").value;
 
     try {
-      const { user, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { name } },
-      });
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { name } },
+        });
 
-      if (error) throw new Error(error.message);
+        if (error) throw new Error(error.message);
 
-      alert("Sign-up successful! Please check your email to confirm your account.");
-      saveUserData();
+        alert("Sign-up successful! Please check your email to confirm your account.");
+
+        // Save user to 'clients' table
+        await saveUserData(data.user);
+
     } catch (err) {
-      console.error("Sign-up error:", err.message);
-      alert(err.message);
+        console.error("Sign-up error:", err.message);
+        alert(err.message);
     }
-  });
+});
 
   // Sign-in form handler
   const signinForm = document.getElementById("signinModal");
