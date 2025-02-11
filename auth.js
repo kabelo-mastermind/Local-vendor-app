@@ -103,7 +103,7 @@ signupForm.addEventListener("submit", async (e) => {
       // Close the modal after successful login
       document.getElementById("signinModal").style.display = "none"; // Hide the modal
 
-      alert("Sign-in successful refresh page!");
+      alert("Sign-in successful ");
 
       // Update the UI to reflect login state
       currentUser = user;
@@ -111,6 +111,8 @@ signupForm.addEventListener("submit", async (e) => {
 
       // Now you can make requests after successful login
       fetchAndPlotLocations(); // Optionally call any other methods for post-login actions
+      location.reload(); // ✅ Refresh the page to remove the products
+
 
     } catch (err) {
       console.error("Sign-in error:", err.message);
