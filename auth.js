@@ -291,14 +291,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Check if the user is authenticated
     if (error) {
       console.error("Error getting session:", error.message);
-      alert("An error occurred while checking your login status."); // More informative error message
+      alert("An error occurred while checking your login status.");
       return;
     }
 
     if (!session?.user) { // Use optional chaining for safety
-      console.log("User not logged in: Not fetching locations or products."); // More informative log
-      // Optionally: Display a message on the map or page indicating that the user needs to log in.
-      return;
+      console.log("User not logged in: Not fetching locations or products.");
+      alert("Please log in to view locations and products."); // Inform the user
+      return; // Exit if no user is logged in
     }
 
     console.log("User logged in:", session.user.email); // Debugging log
@@ -308,12 +308,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   } catch (err) {
     console.error("Error in session check:", err.message);
-    alert("An unexpected error occurred while checking the session."); // More generic error
+    alert("An unexpected error occurred while checking the session.");
   }
 });
 
 // ✅ Fetch and plot all user locations and products (only if the user is logged in)
 async function fetchAndPlotLocations() {
+  // Add session check here
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user) return;
+
   try {
     // ✅ Fetch locations from 'current_locations' table (all users' locations)
     const { data: locations, error: locationError } = await supabase
