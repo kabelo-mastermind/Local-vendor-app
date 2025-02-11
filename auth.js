@@ -289,10 +289,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const { data: { session }, error } = await supabase.auth.getSession();
 
     // Check if the user is authenticated
-    if (error || !session || !session.user) {
-      console.error("User not authenticated. Please log in.");
-      alert("User not authenticated. Please log in.");
-      return; // Exit early if no user is logged in
+    if (error) {
+      console.error("Error getting session:", error.message);
+      alert("An error occurred while checking your login status."); // More informative error message
+      return;
+    }
+
+    if (!session?.user) { // Use optional chaining for safety
+      console.log("User not logged in: Not fetching locations or products."); // More informative log
+      // Optionally: Display a message on the map or page indicating that the user needs to log in.
+      return;
     }
 
     console.log("User logged in:", session.user.email); // Debugging log
@@ -302,7 +308,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   } catch (err) {
     console.error("Error in session check:", err.message);
-    alert("An error occurred while checking the session.");
+    alert("An unexpected error occurred while checking the session."); // More generic error
   }
 });
 
@@ -359,8 +365,8 @@ async function fetchAndPlotLocations() {
             .join(", "); // Convert array to comma-separated string
 
         // ✅ Popup content
-        const popupContent = userProducts.length > 0 
-            ? `<b>Products:</b> ${userProducts}` 
+        const popupContent = userProducts.length > 0
+            ? `<b>Products:</b> ${userProducts}`
             : "No products requested.";
 
         // ✅ Add marker to the map for all users
