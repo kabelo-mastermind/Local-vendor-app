@@ -297,7 +297,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     console.log("User logged in:", session.user.email); // Debugging log
 
-    // Fetch and plot locations if the user is authenticated
+    // Fetch and plot locations only if the user is authenticated
     await fetchAndPlotLocations();  // No need to pass user ID anymore
 
   } catch (err) {
@@ -309,71 +309,72 @@ document.addEventListener("DOMContentLoaded", async () => {
 // ✅ Fetch and plot all user locations and products (only if the user is logged in)
 async function fetchAndPlotLocations() {
   try {
-      // ✅ Fetch locations from 'current_locations' table (all users' locations)
-      const { data: locations, error: locationError } = await supabase
-          .from("current_locations")
-          .select("latitude, longitude, user_id"); // Fetch all users' locations
+    // ✅ Fetch locations from 'current_locations' table (all users' locations)
+    const { data: locations, error: locationError } = await supabase
+        .from("current_locations")
+        .select("latitude, longitude, user_id"); // Fetch all users' locations
 
-      if (locationError) {
-          console.error("Error fetching locations:", locationError.message);
-          alert("Failed to load locations.");
-          return;
-      }
+    if (locationError) {
+        console.error("Error fetching locations:", locationError.message);
+        alert("Failed to load locations.");
+        return;
+    }
 
-      // ✅ Fetch selected products for all users from 'products' table
-      const { data: products, error: productError } = await supabase
-          .from("products")
-          .select("name, user_id")
-          .eq("selected", true); // Only fetch selected products
+    // ✅ Fetch selected products for all users from 'products' table
+    const { data: products, error: productError } = await supabase
+        .from("products")
+        .select("name, user_id")
+        .eq("selected", true); // Only fetch selected products
 
-      if (productError) {
-          console.error("Error fetching products:", productError.message);
-          return;
-      }
+    if (productError) {
+        console.error("Error fetching products:", productError.message);
+        return;
+    }
 
-      // ✅ Clear existing markers before adding new ones
-      map.eachLayer((layer) => {
-          if (layer instanceof L.Marker) {
-              map.removeLayer(layer);
-          }
-      });
+    // ✅ Clear existing markers before adding new ones
+    map.eachLayer((layer) => {
+        if (layer instanceof L.Marker) {
+            map.removeLayer(layer);
+        }
+    });
 
-      // ✅ Custom Leaflet marker icon
-      const customIcon = L.icon({
-          iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-          shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-          iconSize: [25, 41],
-          iconAnchor: [12, 41],
-          popupAnchor: [1, -34],
-          shadowSize: [41, 41]
-      });
+    // ✅ Custom Leaflet marker icon
+    const customIcon = L.icon({
+        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+    });
 
-      // ✅ Loop through locations and add markers for all users
-      locations.forEach((location) => {
-          const { latitude, longitude, user_id } = location;
+    // ✅ Loop through locations and add markers for all users
+    locations.forEach((location) => {
+        const { latitude, longitude, user_id } = location;
 
-          // Find all products for this user
-          const userProducts = products
-              .filter(product => product.user_id === user_id)
-              .map(product => product.name)
-              .join(", "); // Convert array to comma-separated string
+        // Find all products for this user
+        const userProducts = products
+            .filter(product => product.user_id === user_id)
+            .map(product => product.name)
+            .join(", "); // Convert array to comma-separated string
 
-          // ✅ Popup content
-          const popupContent = userProducts.length > 0 
-              ? `<b>Products:</b> ${userProducts}` 
-              : "No products requested.";
+        // ✅ Popup content
+        const popupContent = userProducts.length > 0 
+            ? `<b>Products:</b> ${userProducts}` 
+            : "No products requested.";
 
-          // ✅ Add marker to the map for all users
-          L.marker([latitude, longitude], { icon: customIcon })
-              .addTo(map)
-              .bindPopup(popupContent);
-      });
+        // ✅ Add marker to the map for all users
+        L.marker([latitude, longitude], { icon: customIcon })
+            .addTo(map)
+            .bindPopup(popupContent);
+    });
 
   } catch (err) {
       console.error("Error fetching locations:", err.message);
       alert("An error occurred while fetching locations.");
   }
 }
+
 
 
 
